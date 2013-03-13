@@ -25,10 +25,10 @@
 <body>
 	<header id="branding" role="banner" class="clearfix">
 	  <hgroup id="logo">
-	      <h1><span><a href="http://transport.yoha.co.uk/" title="cibi.me" rel="home">Mapping tests</a></span></h1>
+	      <h1><span><a href="http://transport.yoha.co.uk/" title="cibi.me" rel="home">Southend Mapping</a></span></h1>
 	      <h2>
-			<a href="?" rel="home">Animated</a> | <a href="?q=map&map=map-imageoverlay" rel="home">Overlay</a>  
-		  </h2>
+	       <a href="?q=map-geojson" rel="home">GeoJson</a>  | <a href="?q=map-animatedpaths" rel="home">Ani</a> | <a href="?q=map-imageoverlay" rel="home">Overlay</a>   
+	      </h2>
 	  </hgroup>
 	</header>  
 
