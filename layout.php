@@ -27,16 +27,15 @@
 	  <hgroup id="logo">
 	      <h1><span><a href="http://transport.yoha.co.uk/" title="cibi.me" rel="home">Southend Mapping</a></span></h1>
 	      <h2>
-	       <a href="?q=map-geojson" rel="home">GeoJson</a>  | <a href="?q=map-animatedpaths" rel="home">Ani</a> | <a href="?q=map-imageoverlay" rel="home">Overlay</a>   
+	       <a href="?q=map-live" rel="home">Refresh Live data</a>  
 	      </h2>
 	  </hgroup>
 	</header>  
 
   <div id="map"></div>
-
-  <script src="libs-js-css/jquery.min.js"></script>
-  <script src="libs-js-css/leaflet.js"></script>
-  <script src="libs-js-css/AnimatedMarker.js"></script>
+  <script type="text/javascript" src="libs-js-css/jquery.min.js"></script>
+  <script type="text/javascript" src="libs-js-css/leaflet.js"></script>
+  <script type="text/javascript" src="libs-js-css/AnimatedMarker.js"></script>
   <script src="<?php print  $js; ?>"></script>
 </body>
 </html>

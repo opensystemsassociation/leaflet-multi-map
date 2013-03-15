@@ -16,35 +16,42 @@ lmm_init();
 /* 
  * Application logic   
 */
-function lmm_init(){  
+function lmm_init(){
+
+  // prep vars  
   $page = '';  
+  $val = '';
   if(isset($_GET['q'])) $page = lmm_checkInput($_GET['q']);
+
+  // select output
   switch($page){      
-    case "geojson":
-      print lmm_geojson();
     case "parsedata": 
       lmm_parsedata(); 
     break;  
     case "savedata": 
       lmm_saveposteddata(); 
-    break;      
+    break; 
+    case "postform":
+      lmm_postform(); 
+    break;     
     default:  
       if($page!=''){
         $js = $page.'/custom.js';
       }else{
-        $js = 'map-geojson/custom.js';
+        $js = 'map-live/custom.js';
       }  
       include('layout.php');
     break; 
-  }   
+  }  
+ 
 }
 
 
 /* 
  * Save posted lat/lng data
 */
-function lmm_geojson(){
-   
+function lmm_parsedata($jsonfile){
+   print $whichdata;
 }
 
 /* 
@@ -54,15 +61,42 @@ function lmm_saveposteddata(){
   if(isset($_POST['la'])) $lat  = $_POST['la'];      
   else $lat = 0;
   if(isset($_POST['lo'])) $lng  = $_POST['lo'];      
-  else $lng = 0; 
-  $ip = $_SERVER['REMOTE_ADDR'];   
-  $msg = "$lat,$lng,$ip\n";
-  $err = write_to_file($msg, "data.txt");
-  if($err) print $err; // If there's been an error let us know  
-  else print "posted";
+  else $lng = 0;  
+  if($lat!=0 && $lng!=0 ){
+    $ip = $_SERVER['REMOTE_ADDR'];   
+    $msg = ",[$lat,$lng]"; 
+    $path = $_SERVER['DOCUMENT_ROOT']."/sites/transport.yoha.co.uk/leaflet-multi-map/map-live/tracks/$ip.txt";     
+    
+    if(!file_exists($path)){
+      $f = fopen($path, "a+");
+      fwrite($f, $msg);
+      fclose($f);
+      chmod($path, 0777);
+    }else{
+      $f = fopen($path, 'a') or die("can't open file");
+      fwrite($f, $msg);
+      fclose($f);
+    }  
+  }
+
+}  
+
+
+/* 
+ * Save posted lat/lng data
+*/
+function lmm_postform(){
+  print ' 
+   <html> 
+    <form action="?q=savedata" method="post">
+      lat: <input type="text" name="la" value="51.54695"><br>
+      Lng: <input type="text" name="lo" value="0.71162"><br>
+      <input type="submit" value="Submit">
+    </form>
+    </body>
+    </html>
+  ';
 }
-
-
 /* 
  * Write data to the begining of a file
 */ 
@@ -98,28 +132,6 @@ function lmm_saveimage(){
   );
 }  
 
-
-/* 
- * Quick and dirty tester function to parse submitted lat/lng data   
-*/
-function lmm_parsedata(){
-  $str ="51.477766,-0.025259,82.132.224.4
-  51.477757,-0.025247,82.132.224.4
-  51.477749,-0.025233,82.132.224.4
-  51.47775,-0.025266,82.132.224.4
-  51.477744,-0.02531,82.132.224.4
-  51.477744,-0.025358,82.132.224.4
-  51.477745,-0.025398,82.132.224.4
-  51.477748,-0.025419,82.132.224.4
-  51.477746,-0.025437,82.132.224.4";  
-  $array = explode("\n", trim($str));  
-  print 'L.polyline([';
-  foreach($array as $line){
-     $data = explode(',',$line);  
-     print  '['.$data[0].','.$data[1].'],';  
-  } 
-  print ']),';
-}
 
 /* 
  * Sanitise strings to prevent SQL inject attacks etc   
