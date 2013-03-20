@@ -21,13 +21,21 @@
   <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
   <script src="http://css3-mediaqueries-js.googlecode.com/svn/trunk/css3-mediaqueries.js"></script>
 <![endif]-->
+<script type="text/javascript">
+	<?php 
+		foreach($jsvars as $key=>$value){
+			print "var $key='$value';\n";
+		}
+	?>
+</script>
 </head>
 <body>
 	<header id="branding" role="banner" class="clearfix">
 	  <hgroup id="logo">
 	      <h1><span><a href="http://transport.yoha.co.uk/" title="cibi.me" rel="home">Southend Mapping</a></span></h1>
 	      <h2>
-	       <a href="?q=map-live" rel="home">Refresh Live data</a>  
+	       <a href="?q=map-live">Refresh Live data</a>  |
+	       <a href="?q=map-live&amp;dlat=51.44625&amp;dlng=-0.11124">Tulse Hill</a>
 	      </h2>
 	  </hgroup>
 	</header>  

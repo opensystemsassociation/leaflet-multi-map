@@ -1,12 +1,17 @@
 (function(){ 
-  /* SETUP VARIABLES  */   
+  /* SETUP VARIABLES  */  
+  if(dlat=='' || dlng=='') {
+    dlat = 51.54335; // Southend
+    dlng = 0.71033;  // Southend
+  }
+
   // console.log('something');      
   var rootdir = "map-live/";
   var routeLines;  
   var config = {
       tileUrl : 'http://{s}.tiles.mapbox.com/v3/openplans.map-g4j0dszr/{z}/{x}/{y}.png',
       tileAttrib : 'Map tiles: OpenStreetMap ',
-      initLatLng : new L.LatLng(51.54335, 0.71033),    // SOUTHEND  
+      initLatLng : new L.LatLng(dlat, dlng),      
       initZoom : 15,
       minZoom : 12,
       maxZoom :17
