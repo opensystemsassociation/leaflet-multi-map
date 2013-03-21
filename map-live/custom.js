@@ -1,8 +1,10 @@
 (function(){ 
   /* SETUP VARIABLES  */  
+  var defaults = false;
   if(dlat=='' || dlng=='') {
     dlat = 51.54335; // Southend
     dlng = 0.71033;  // Southend
+    defaults = true;
   }
 
   // console.log('something');      
@@ -16,8 +18,14 @@
       minZoom : 12,
       maxZoom :17
   };
-  var linestyle = {
+  var redlinestyle = {
       color: 'red', 
+      weight: 2, 
+      opacity: 0.5,
+      smoothFactor: 1
+  };  
+  var bluelinestyle = {
+      color: 'blue', 
       weight: 2, 
       opacity: 0.5,
       smoothFactor: 1
@@ -46,18 +54,39 @@
            loaddata(track)
       }); 
   }); 
+
+  /* CURRRENT DEVICE POSITIONS VIA AJAX */   
+  var jsonpath = rootdir+"livedevices.php";   
+  var livepositions = {};
+  $.getJSON(jsonpath, function(data) {
+      livepositions = data; 
+      var lastpos;
+      $.each(livepositions.gps, function(i, position) { 
+          var marker = addmarker(position, 10, bluelinestyle);
+          lastpos = position;
+          var name = '<strong>"'+livepositions.dname[i]+'"</strong> ';
+          addboundpopup(marker, name+" Last Position On<br />"+livepositions.date[i]); 
+      }); 
+      if(defaults==false){
+        map.setView(config.initLatLng, config.initZoom);
+      }else{
+        map.setView(lastpos, config.initZoom);
+      }
+  }); 
   
-  /* LOAD GEOJSON VIA AJAX */
+
+  /* LOAD DATATRACKS VIA AJAX */
   function loaddata(track){
-    var jsonpath = rootdir+"geojson.php?file="+track;   
+    //var jsonpath = rootdir+"geojson.php?file="+track; 
+    var jsonpath = rootdir+'tracks/'+track;  
     $.getJSON(jsonpath, function(data) {
-     	 var gps = data.track.points.gps;      
-       var line = addline(gps, linestyle);
-       var len = gps.length-1; 
-       addmarker(gps[0], 10, linestyle);   
-       addmarker(gps[len], 10, linestyle);  
-       routeLines = [ L.polyline(gps) ];   
-       moveme();  
+     	var gps = data.track.points.gps;   
+      var line = addline(gps, redlinestyle);
+      var len = gps.length-1; 
+      addmarker(gps[0], 10, redlinestyle);   
+      addmarker(gps[len], 10, redlinestyle);  
+      routeLines = [ L.polyline(gps) ];   
+      moveme();  
     });
   } 
 
@@ -81,7 +110,7 @@
           //});
         }
       });
-      map.addLayer(marker);
+      map.addLayer(marker)
       $(marker._icon).hide().fadeIn(100, function(){
         marker.start();   
       });
@@ -103,7 +132,26 @@
   */
   function addpopup(latlng, content) { 
     thispopup = L.popup();   
+    return thispopup.setLatLng(latlng).setContent(content).addTo(map);
+  } 
+
+  /* ADD A POPUP 
+  *  Example usage: 
+  *     var content = "A message <strong>to</strong> display.";
+  *     addpopup([51.54193, 0.71995], content);
+  */
+  function addclosingpopup(latlng, content) { 
+    thispopup = L.popup();   
     return thispopup.setLatLng(latlng).setContent(content).openOn(map);
+  } 
+
+    /* ADD A POPUP BOUND TO A MARKER
+  *  Example usage: 
+  *     var content = "A message <strong>to</strong> display.";
+  *     addpopup([51.54193, 0.71995], content);
+  */
+  function addboundpopup(marker, content) {   
+    return marker.bindPopup(content).openPopup();
   } 
     
   /* ADD A DOT TO THE CURRENT MAP 

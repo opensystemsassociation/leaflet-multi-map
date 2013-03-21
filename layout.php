@@ -34,8 +34,9 @@
 	  <hgroup id="logo">
 	      <h1><span><a href="http://transport.yoha.co.uk/" title="cibi.me" rel="home">Southend Mapping</a></span></h1>
 	      <h2>
-	       <a href="?q=map-live">Refresh Live data</a>  |
-	       <a href="?q=map-live&amp;dlat=51.44625&amp;dlng=-0.11124">Tulse Hill</a>
+	       <a href="?q=map-live">Last</a>  |
+	       <a href="?q=map-live&amp;dlat=51.54335&amp;dlng=0.7103">SOS</a>  |
+	       <a href="?q=map-live&amp;dlat=51.44625&amp;dlng=-0.11124">TulseH</a>
 	      </h2>
 	  </hgroup>
 	</header>  
