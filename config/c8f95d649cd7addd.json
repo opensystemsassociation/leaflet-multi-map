@@ -1,0 +1,22 @@
+{
+    "tickInterval": 1000,
+    "recordInterval" : 5,
+    "stopAfter" : 7200,
+    "dirformat" : "y-m-d-m-s-ms",
+    "activityTags" : [
+        "favourite route",
+        "least favourites route",
+        "most scenic route",
+        "least scenic route",
+        "most quiet route",
+        "loudest quiet route",
+        "lightest route",
+        "darkest route",
+        "smoothest route",
+        "most unevent route",
+        "surface exploration route",
+        "with large object",
+        "on public transport"
+    ],
+    "phonename" : "bob"
+}
