@@ -1,12 +1,19 @@
 <?php  
 /* ======================
  * Selection of functions to: 
- *   - Display a specific map
  *   - Save data to a file via POST or GET
+ *   - Display a specific map
  *   - Return formated data in response to an AJAX request
  *   - Test output
  * ======================
 */
+
+function lmm_getConfig(){
+    return (object) array(
+        "defaultMap"    => "map-live"
+    );
+}
+
 lmm_init();
 
 
@@ -14,8 +21,8 @@ lmm_init();
  * Application logic   
 */
 function lmm_init(){
-
   // prep vars  
+  $config = lmm_getConfig();
   $page = '';  
   $val = '';
   $jsvars = array();
@@ -38,8 +45,8 @@ function lmm_init(){
       if($page!=''){
         $js = $page.'/custom.js';
       }else{
-        $js = 'map-live/custom.js';
       }  
+        $js = "{$config->defaultMap}/custom.js";
       include('layout.php');
     break; 
   }  
@@ -65,8 +72,8 @@ function lmm_savelivedevice(){
     $root = $_SERVER['DOCUMENT_ROOT']."/sites/transport.yoha.co.uk/leaflet-multi-map/map-live/livedevices";
     $path = "$root/$uuid.txt";
     // Create/Write to file
-    if(!file_exists($path)){ 
       $f = fopen($path, "a+");
+    if(!file_exists($path)){ 
       fwrite($f, $msg);
       fclose($f);
       chmod($path, 0755);
@@ -87,57 +94,54 @@ function lmm_savelivedevice(){
 }  
 
 /* 
- * Save posted lat/lng data
-*/
+ * Save posted lat/lng data - ?q=savedata&?uuid={uuid}&title={tracktitle}&FILES['data']
+ */
 function lmm_saveposteddata(){   
-  // Set the variables
-  $status = "";
-  $uuid = lmm_checkPOSTGETvar('uuid', NULL, 'GET');
-  $varsstr = lmm_checkPOSTGETvar('vars', '', 'POST');
-  $vars = json_decode($varsstr);
+    // Set the variables
+    $status = "";
+    $uuid = lmm_checkPOSTGETvar('uuid', NULL, 'GET');
+    $title = lmm_checkPOSTGETvar('title', NULL, 'GET');
+    $hasFilePost = isset($_FILES['data']);
 
-  // if ok, then save them
-  if(isset($vars->track) && $uuid!=NULL && $varsstr!='') {
-    // Initialise vars
-    $track = str_replace(' ', '', lmm_checkisset($vars->track->title, 'default') );
-    $status .= "gv";       
-    $msg = $varsstr; 
-    $root = $_SERVER['DOCUMENT_ROOT']."/sites/transport.yoha.co.uk/leaflet-multi-map/map-live/tracks/$uuid";
-    $trackdir = "$root/$track";
-    $path = "$trackdir/data.txt";
-    // Create a root directory if it doesn't exist
-    if(!is_dir($root)){
-      mkdir($root);
-      //chmod($root, 0755);
-      $status .= " crd";
+    // Passed validation?
+    if($uuid!=NULL && $title!='' && $hasFilePost) {
+
+        // If all params are present then get file.
+        $file = $_FILES['data'];
+
+        // Initialise vars
+        $track = str_replace(' ', '', lmm_checkisset($title, 'default') );
+        $status .= "gv"; // Got Variables.
+        $trackdir = realpath(dirname(".")) . "/map-tracks/tracks/$uuid/$track";
+        $trackpath = "$trackdir/data.json";
+
+        // Create a track directory if it doesn't exist
+        if(!is_dir($trackdir)){
+            mkdir($trackdir, 0777, true); // Recursive.
+            $status .= " ctd"; // Directory created.
+        }
+
+        // If file exists then break. Should not happen.
+        if( file_exists( $trackpath ) ){
+            $status .= " fex"; // File EXists.
+            print $status;
+            exit;
+        }
+
+        // Move uploaded file.
+        if( move_uploaded_file($file['tmp_name'], $trackpath )) {
+            $status .= " fct"; // File Created.
+            echo "File is valid, and was successfully uploaded.\n";
+        } else {
+            $status .= " ff"; // File Failed.
+            echo "Possible file upload attack!\n";
+        }
+
+    }else{
+        $status .= "NoVars";
     }
-    // Create a track directory if it doesn't exist
-    if(!is_dir($trackdir)){
-      mkdir($trackdir);
-      //chmod($trackdir, 0755);
-      $status .= " ctd";
-    }
-    // Create/Write to file
-    if(!file_exists($path)){ 
-      $f = fopen($path, "a+");
-      fwrite($f, $msg);
-      fclose($f);
-      //chmod($path, 0755);
-      $status .= " cf";    
-    }else{   
-      $f = fopen($path, 'w') or die("Can't Open File");
-      fwrite($f, $msg);
-      fclose($f);
-      $status .= " w";  
-    }    
-  }else{
-    $status .= "NoVars";
-  }
-  // print a json response
-  print $status;
-  // Log the current output
-  //lmm_logoutput($status);
-}  
+    print $status;
+}
 
 /*
 * Helper function to log output
@@ -190,7 +194,7 @@ function lmm_logoutput($status){
  * Post some lat/lng data
 */
 function lmm_postform(){
-  print ' 
+  print '
    <html> 
     <form action="?q=savedata" method="post">
       lat: <input type="text" name="la" value="51.54695"><br>
