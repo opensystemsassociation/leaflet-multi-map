@@ -1,6 +1,6 @@
 <?php
 $arr = array();
-$arr = readdirectory('tracks', 'data.txt', $arr);
+$arr = readdirectory('tracks', 'data.json', $arr);
 print json_encode($arr);  
   
 // Recursivly search a directory structure for files named 'data.txt'
