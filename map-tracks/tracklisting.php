@@ -1,6 +1,6 @@
 <?php
 include_once "../utils.php";
-$format = lmm_checkPOSTGETvar("format", "html", "GET");
+$format = lmm_checkPOSTGETvar("format", "json", "GET");
 $arr = array();
 $arr = readdirectory('tracks', 'data.json', $arr);
   
@@ -55,6 +55,45 @@ if( $format == "json" ) {
 <![endif]-->
 </head>
 <body>
+<ul class="tracks">
+<?php 
+$scriptLoc = "http://".$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF'];
+$baseUrl = substr($scriptLoc, 0, strpos($scriptLoc, basename(realpath(dirname("."))) ));
+$link = $baseUrl."?q=map-tracks&uuid=%s&title=%s";
+
+$currDir = "";    
+foreach( $arr as  $filePath ) {
+
+    // -- Directories.
+    $dirseparator_first = strpos($filePath, DIRECTORY_SEPARATOR);
+    $dir = substr( $filePath, 0,  $dirseparator_first);
+    // -- Files.
+    $dirseparator_last = strrpos($filePath, DIRECTORY_SEPARATOR);
+    $path = substr( $filePath, $dirseparator_first+1, $dirseparator_last-$dirseparator_first-1);
+    // -- Url.
+    $url = sprintf($link, $dir, $path);
+
+    // First directory.
+    if( $currDir === "" ) {
+        echo "<li>$dir
+            <ul><li><a href='$url'>$path</a>";
+        $currDir = $dir;
+    } else {
+        echo "</li>
+            <li><a href='$url'>$path<a/>";
+    }
+    // New directory.
+    if( $currDir !== $dir ) {
+        echo "</li></ul>
+            </li>
+            <li>$dir";
+        $currDir = $dir;
+    }
+
+} ?>
+</li></ul>
+</li>
+</ul>
 </body>
 </html>
 <? }; ?>

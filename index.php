@@ -9,6 +9,27 @@
 */
 include_once "utils.php";
 
+// Returns /path/to/maps/index.php
+function lmm_getBase($getdir=false) {
+    // Get executing filename.
+    $break = explode('/', $_SERVER["SCRIPT_NAME"]);
+    $currfile = $break[count($break) - 1]; 
+
+    $url = $_SERVER['REQUEST_URI']; 
+    $parts = explode('/',$url);
+    $dir = "";
+    for ($i = 0; $i < count($parts) - 1; $i++) {
+
+        if( $getdir === false 
+            || ( $getdir === true && $parts[$i] != $currfile ) ){
+                $dir .= $parts[$i] . "/";
+            }
+
+    }
+    return $dir;
+
+}
+
 function lmm_getConfig(){
     return (object) array(
         "defaultMap"    => "map-live"
@@ -43,6 +64,8 @@ function lmm_init(){
       lmm_postform(); 
     break;     
     default:  
+        $baseUrl = lmm_getBase();
+        $baseDir = lmm_getBase(true);
       if($page!=''){
         $js = $page.'/custom.js';
       }else{
