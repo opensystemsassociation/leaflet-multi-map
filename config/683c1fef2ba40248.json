@@ -16,7 +16,12 @@
         "most unevent route",
         "surface exploration route",
         "with large object",
-        "on public transport"
+        "on public transport",
+        "magic carpet ride"
     ],
-    "phonename" : "TK-Phone"
+    "postUrls"    : {
+        "live" : "index.php?q=savelivedevice",
+        "data" : "index.php?q=savedata"
+    },
+    "phonename" : "TK-phone"
 }
