@@ -2,8 +2,8 @@
     /* SETUP VARIABLES  */  
     var defaults = false;
     if(dlat=='' || dlng=='') {
-        dlat = 51.55445; // Southend
-        dlng = -0.07665;  // Southend
+        dlat = 51.4458016;
+        dlng = -0.1119497;
         defaults = true;
     }
 
@@ -49,15 +49,18 @@
     console.log(jsonpath);
     $.getJSON(jsonpath, function(data) {
         console.log(data);
-        var gps = data.points.gps;   
+        var gps = data.track.points.gps;   
         var line = addline(gps, redlinestyle);
         var len = gps.length-1; 
+
+        for (var i = 0; i < gps.length; i++) {
+            gps[i]
+        };
         addmarker(gps[0], 10, redlinestyle);   
         addmarker(gps[len], 10, redlinestyle);  
         routeLines = [ L.polyline(gps) ];   
         moveme();  
     });
-
 
 
     /* LOOP AN ANIMATION ALONG SOME POLYLINES 
