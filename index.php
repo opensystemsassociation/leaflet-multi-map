@@ -63,8 +63,8 @@ function lmm_init(){
     case "savedata":
         lmm_saveposteddata(); 
     break; 
-    case "postform":
       lmm_postform(); 
+    case "postform":
     break;     
     default:  
         $baseUrl = lmm_getBase();
@@ -117,7 +117,7 @@ function lmm_savelivedevice(){
   // print a json response
   print $status;
   // Log the current output
-  lmm_logoutput($status);
+  // lmm_logoutput($status);
 }  
 
 /* 
