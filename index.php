@@ -145,13 +145,6 @@ function lmm_saveposteddata(){
             $status .= " ctd"; // Directory created.
         }
 
-        // If file exists then break. Should not happen.
-        if( file_exists( $trackpath ) ){
-            $status .= " fex"; // File EXists.
-            print $status;
-            exit;
-        }
-
         // Move uploaded file.
         if( move_uploaded_file($file['tmp_name'], $trackpath )) {
             $status .= " fct"; // File Created.
