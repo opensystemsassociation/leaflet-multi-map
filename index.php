@@ -57,8 +57,11 @@ function lmm_init(){
     case "savelivedevice":
       lmm_savelivedevice(); 
     break;        
+    case "savedatastring":
+        lmm_saveposteddatastring();
+    break; 
     case "savedata":
-      lmm_saveposteddata(); 
+        lmm_saveposteddata(); 
     break; 
     case "postform":
       lmm_postform(); 
@@ -93,7 +96,7 @@ function lmm_savelivedevice(){
     // Initialise vars
     $status .= "gv";       
     $msg = "[\"$time\",$lat,$lng, \"$dn\"]"; 
-    $root = $_SERVER['DOCUMENT_ROOT']."/sites/transport.yoha.co.uk/leaflet-multi-map/map-live/livedevices";
+    $root = realpath(dirname(".")) . "/map-live/live-devices";
     $path = "$root/$uuid.txt";
     // Create/Write to file
       $f = fopen($path, "a+");
@@ -118,7 +121,8 @@ function lmm_savelivedevice(){
 }  
 
 /* 
- * Save posted lat/lng data - ?q=savedata&?uuid={uuid}&title={tracktitle}&FILES['data']
+ * Save posted lat/lng data. Accepts track as file.
+ * URL - ?q=savedata&?uuid={uuid}&title={tracktitle}&FILES['data']
  */
 function lmm_saveposteddata(){   
     // Set the variables
@@ -159,6 +163,62 @@ function lmm_saveposteddata(){
     }
     print $status;
 }
+
+
+/* 
+ * Save posted AppFurnace. Accepts track as string in POST.
+ * URL - ?q=savedatastring&?uuid={uuid}
+ */
+function lmm_saveposteddatastring(){   
+  // Set the variables
+  $status = "";
+  $uuid = lmm_checkPOSTGETvar('uuid', NULL, 'GET');
+  $varsstr = lmm_checkPOSTGETvar('vars', '', 'POST');
+  $vars = json_decode($varsstr);
+
+  // if ok, then save them
+  if(isset($vars->track) && $uuid!=NULL && $varsstr!='') {
+    // Initialise vars
+    $track = str_replace(' ', '', lmm_checkisset($vars->track->title, 'default') );
+    $status .= "gv";       
+    $msg = $varsstr; 
+    $root = realpath(dirname(".")) . "/map-tracks/tracks/$uuid/";
+    $trackdir = "$root/$track";
+    $path = "$trackdir/data.json";
+    // Create a root directory if it doesn't exist
+    if(!is_dir($root)){
+      mkdir($root);
+      //chmod($root, 0755);
+      $status .= " crd";
+    }
+    // Create a track directory if it doesn't exist
+    if(!is_dir($trackdir)){
+      mkdir($trackdir);
+      //chmod($trackdir, 0755);
+      $status .= " ctd";
+    }
+    // Create/Write to file
+    if(!file_exists($path)){ 
+      $f = fopen($path, "a+");
+      fwrite($f, $msg);
+      fclose($f);
+      //chmod($path, 0755);
+      $status .= " cf";    
+    }else{   
+      $f = fopen($path, 'w') or die("Can't Open File");
+      fwrite($f, $msg);
+      fclose($f);
+      $status .= " w";  
+    }    
+  }else{
+    $status .= "NoVars";
+  }
+  // print a json response
+  print $status;
+  // Log the current output
+  //lmm_logoutput($status);
+}  
+
 
 /* 
  * Post some lat/lng data

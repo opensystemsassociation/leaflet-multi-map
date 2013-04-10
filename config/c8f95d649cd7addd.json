@@ -1,6 +1,8 @@
 {
     "tickInterval": 1000,
     "recordInterval" : 5,
+    "geoUpdateInterval" : 500,
+    "sendCurrPosInterval" : 10000,
     "stopAfter" : 7200,
     "dirformat" : "y-m-d-m-s-ms",
     "activityTags" : [

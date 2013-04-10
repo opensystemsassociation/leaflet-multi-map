@@ -13,6 +13,7 @@ function lmm_checkisset($var, $default){
 * Helper function to log output
 *
 */
+/*
 function lmm_logoutput($status){
   $msg = strftime('%c')."\n$status\n";
   // Prep the vars
@@ -39,13 +40,14 @@ function lmm_logoutput($status){
   $msg .= 'platform:'.$vars->track->device->platform."\n";
   $msg .= 'version:'.$vars->track->device->version."\n";
   $msg .= 'uuid:'.$vars->track->device->uuid."\n";
-  */
+  // /*
   // Write to file
   $logpath = "/var/www/localhost/htdocs/drupal7/sites/transport.yoha.co.uk/leaflet-multi-map/map-live/log.txt";
   $f = fopen($logpath, 'a') or die(" can't open file");
   fwrite($f, "\n$msg\n\n");
   fclose($f);   
 }
+*/
 
 /* 
  * Check if POST/GET variable is set and asign default value
