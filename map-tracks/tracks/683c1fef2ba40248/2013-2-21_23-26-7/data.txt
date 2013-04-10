@@ -1,0 +1,1 @@
+{"track":{"title":"2013-2-21_23-26-7","author":"Your Name","starttime":1363908367118,"endtime":1363908367118,"device":{"name":"GT-I9000","cordova":"2.1.0","platform":"Android","version":"2.3.6","uuid":"683c1fef2ba40248"},"points":{"elapsed":[2867],"gps":[[51.4458087,-0.1119536]],"imagefile":[0],"accelerometer":[[0,0,0]],"shakeevent":[0]}}}
