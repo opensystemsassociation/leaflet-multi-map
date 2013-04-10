@@ -75,24 +75,30 @@ foreach( $arr as  $filePath ) {
 
     // First directory.
     if( $currDir === "" ) {
-        echo "<li>$dir
-            <ul><li><a href='$url'>$path</a>";
+        echo "
+    <li>$dir
+        <ul>
+            <li><a href='$url'>$path</a>";
+        $currDir = $dir;
+
+    // New directory.
+    } else if( $currDir !== $dir ) {
+        echo "</li>
+        </ul>
+    </li>
+    <li>$dir
+        <ul>
+            <li><a href='$url'>$path</a>";
         $currDir = $dir;
     } else {
         echo "</li>
             <li><a href='$url'>$path<a/>";
     }
-    // New directory.
-    if( $currDir !== $dir ) {
-        echo "</li></ul>
-            </li>
-            <li>$dir";
-        $currDir = $dir;
-    }
 
 } ?>
-</li></ul>
 </li>
+        </ul>
+    </li>
 </ul>
 </body>
 </html>
