@@ -55,7 +55,7 @@ function lmm_init(){
   // select output
   switch($page){
     case "savelivedevice":
-      lmm_savelivedevice(); 
+      // lmm_savelivedevice(); 
     break;        
     case "savedatastring":
         lmm_saveposteddatastring();
@@ -96,10 +96,10 @@ function lmm_savelivedevice(){
     // Initialise vars
     $status .= "gv";       
     $msg = "[\"$time\",$lat,$lng, \"$dn\"]"; 
-    $root = realpath(dirname(".")) . "/map-live/live-devices";
+    $root = realpath(dirname(".")) . "/map-tracks/live-devices";
     $path = "$root/$uuid.txt";
     // Create/Write to file
-      $f = fopen($path, "a+");
+    $f = fopen($path, "a+");
     if(!file_exists($path)){ 
       fwrite($f, $msg);
       fclose($f);
