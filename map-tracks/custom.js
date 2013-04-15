@@ -72,7 +72,8 @@
      */
     function moveme(){
         $.each(routeLines, function(i, routeLine) {
-            var marker = L.animatedMarker(routeLine.getLatLngs(), {
+	    var latlon = routeLine.getLatLngs(); 
+            var marker = L.animatedMarker(latlon, {
                 icon: dotIcon,
                 autoStart: false,
                 onEnd: function() {

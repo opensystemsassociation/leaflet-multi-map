@@ -60,7 +60,7 @@ if( $format == "json" ) {
 $scriptLoc = "http://".$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF'];
 $baseUrl = substr($scriptLoc, 0, strpos($scriptLoc, basename(realpath(dirname("."))) ));
 $link = $baseUrl."?q=map-tracks&uuid=%s&title=%s";
-
+$trackbaseurl = $baseurl;
 $currDir = "";    
 foreach( $arr as  $filePath ) {
 
@@ -72,13 +72,13 @@ foreach( $arr as  $filePath ) {
     $path = substr( $filePath, $dirseparator_first+1, $dirseparator_last-$dirseparator_first-1);
     // -- Url.
     $url = sprintf($link, $dir, $path);
-
+   
     // First directory.
     if( $currDir === "" ) {
         echo "
     <li>$dir
         <ul>
-            <li><a href='$url'>$path</a>";
+            <li><a href='$url'>$path</a> $jsonLink";
         $currDir = $dir;
 
     // New directory.
@@ -88,11 +88,11 @@ foreach( $arr as  $filePath ) {
     </li>
     <li>$dir
         <ul>
-            <li><a href='$url'>$path</a>";
+            <li><a href='$url'>$path</a> $jsonLink";
         $currDir = $dir;
     } else {
         echo "</li>
-            <li><a href='$url'>$path<a/>";
+            <li><a href='$url'>$path<a/> $jsonLink";
     }
 
 } ?>
