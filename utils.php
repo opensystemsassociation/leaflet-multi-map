@@ -1,5 +1,25 @@
 <?php  
 
+// Which IP addresses have permission to delete tracks?
+$IParray = array("217.44.120.135");
+
+// Now lets sort permissions
+$IP = $_SERVER['REMOTE_ADDR'];
+if(in_array($IP, $IParray)){
+  define("ISADMIN", true);
+}else{
+  define("ISADMIN", false);
+}
+
+// Give human names to the phones
+$humanuuid = array(
+  '287BE0FC-A3BC-4FE1-94C0-5A8FB42167FE' =>"Toms Iphone",
+  '683c1fef2ba40248'=>"TK Android",
+  'c8f95d649cd7addd'=>"GF Android",
+  'aaf09baa1477949'=>"Grahams Android"
+);
+
+
 /*
 * Helper function to log output
 *

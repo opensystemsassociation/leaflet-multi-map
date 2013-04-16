@@ -52,10 +52,7 @@
         var gps = data.track.points.gps;   
         var line = addline(gps, redlinestyle);
         var len = gps.length-1; 
-
-        for (var i = 0; i < gps.length; i++) {
-            gps[i]
-        };
+        map.setView(gps[0], config.initZoom);
         addmarker(gps[0], 10, redlinestyle);   
         addmarker(gps[len], 10, redlinestyle);  
         routeLines = [ L.polyline(gps) ];   
