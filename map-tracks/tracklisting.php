@@ -225,4 +225,4 @@ function printpage($content){ ?>
   </body>
   </html>
 
-<? }; ?>
+<?php } ?>
