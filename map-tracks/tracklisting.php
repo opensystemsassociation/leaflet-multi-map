@@ -33,7 +33,7 @@ $output = "";
 $deleteoutput = "";
 $editoutput = "";
 if(ISADMIN){
-  $format = "html";
+  if(!is_null($deleteme) || !is_null($editme)) $format = "html";
   $deleteoutput = deletetrackdir($deleteme);
   $editoutput .= edittrack($editme);
 }
@@ -89,6 +89,9 @@ function edittrack($editme){
         fwrite($f, $posted);
       }
       fclose($f);
+
+      $url = "http://".$_SERVER['SERVER_NAME'].'/'.$_SERVER['SCRIPT_NAME']."?format=html";
+      header("Location: $url");
     }
     // Build the edit form
     $submiturl = $_SERVER['SCRIPT_NAME']."?format=html&edit=$editme";
@@ -114,7 +117,7 @@ function readdirectory($path, $searchfor, $arr, $lvl=0){
           $savename = explode('/',$newpath);
           $cnt = count($savename);
           if($ref==$searchfor){
-            $arr['list'] = $savename[$cnt-3].'/'.$savename[$cnt-2].'/'.$savename[$cnt-1];
+            $arr['list'][$savename[$cnt-3]][] = $savename[$cnt-3].'/'.$savename[$cnt-2].'/'.$savename[$cnt-1];
             $arr['orderd'][$savename[$cnt-3]][] = $savename[$cnt-2];
           }
         }
@@ -137,7 +140,8 @@ function nicehtmllist($arr, $humanuuid, $IParray){
     rsort($arr['orderd'][$key]);
     $uuid = $key;
     if(isset($humanuuid[$key])) $uuid = $humanuuid[$key];
-    $output .= "<div class=\"box\"><h3>$uuid</h3>";
+    $output .= "<div class=\"box\"><h3 class=\"phoneid\">$uuid</h3>";
+    $output .= "<div class=\"uuid\">PhoneID:$key</div>";
     $output .=  '<ol>';
 
     // Loop through each track 
@@ -149,32 +153,38 @@ function nicehtmllist($arr, $humanuuid, $IParray){
       $editjsonurl = $_SERVER['SCRIPT_NAME']."?format=html&edit=tracks/$key/$datafile/data.json";
       $deleteurl = "tracks/$key/$datafile";
 
+      // Lets work out the date/time
+      $timedate = explode('-',$datafile);
+      $af = "";
+      if($timedate[0]=='AF'){
+        $af = "AF: ";
+        array_shift($timedate);
+      }
+      $date = $timedate[2].'/'.$timedate[1].'/'.$timedate[0];
+      $time  = date("g:ia", strtotime($timedate[3].':'.$timedate[4].':'.$timedate[5]));
+
       // Lets get the tagname
       $tag = "";
       $jsonfilepath ="tracks/$key/$datafile/data.json";
       $filejson = json_decode(file_get_contents($jsonfilepath));
       if(isset($filejson->track)){
         if(isset($filejson->track->tag)){
-          $tag = $filejson->track->tag;
+          $tag = $af.$filejson->track->tag;
         }
       }
-      
-      // Lets work out the date/time
-      $timedate = explode('-',$datafile);
-      if($timedate[0]=='AF') array_shift($timedate);
-      $date = $timedate[2].'/'.$timedate[1].'/'.$timedate[0];
-      $time  = date("g:ia", strtotime($timedate[3].':'.$timedate[4].':'.$timedate[5]));
 
       // Now prep the links
-      $output .=  "<li>";
-      if(ISADMIN) $output .= "<a class=\"delete\" href=\"?delete=$deleteurl\">[x]</a>";
-      $output .=  " <a href=\"$mapurl\">";
-      $output .=  "<span>$date</span>"; 
+      $output .= "<li>";
+      $output .= "<span class=\"tag\">";
+      if(ISADMIN) $output .= "<a class=\"delete\" href=\"?delete=$deleteurl\">[x]</a> ";
+      $output .= "<a href=\"$mapurl\">$tag</a>";
+      $output .= "</span>";
+      $output .=  "<a class=\"datetime\" href=\"$mapurl\">";
+      $output .=  " <span>$date</span>"; 
       $output .=  " <span>$time</span>"; 
-      $output .=  "</a>";
-      $output .=  " <span class=\"tag\">$tag</span>"; 
+      $output .=  "</a>"; 
       $output .=  " <a class=\"jsonlink\" href=\"$jsonurl\">json</a> "; 
-      if(ISADMIN) $output .=  "<a class=\"jsonlink\" href=\"$editjsonurl\">[e]&nbsp;</a>"; 
+      if(ISADMIN) $output .=  "<a class=\"jsonlink\" href=\"$editjsonurl\">[e]&nbsp;</a>";
       $output .=  "</li>";
     }
     $output .=  "</ol></div>";    
@@ -191,17 +201,25 @@ function printpage($content){ ?>
     <title>List of all tracks</title>
     <style>
       body{font-family:verdana;padding:10px;font-size:13px;}
-      ol{margin:0px;padding:0px;margin-right:5px;}
-      li{list-style:none;border-bottom:1px solid #ccc;}
+      ol{margin:0px;padding:0px;margin-right:5px;border-bottom:1px solid #ccc;}
+      li{list-style:none;border-top:1px solid #ccc;padding-bottom:3px;}
       a{text-decoration:none}
       a.jsonlink{text-decoration:none;color:#ccc;font-size:0.7em;float:right;}
-      .tag{font-size:0.9em;font-color:#555;}
+      .tag{font-size:1em;font-color:#555;clear:both;display:block;}
+      a.jsonlink:hover{color:green;}
+      .tag a:link, .tag a:visited{color:#000;}
+      .tag a:hover{color:#999;}
       .box{float:left;width:24%;}
+      .datetime{font-size:0.8em;color:#ccc;}
+      .datetime:hover{color:green;}
       .footer{clear:both;border-top:20px solid #fff;margin-top:20px;color:#ccc;}
       .delete{color:red;font-size:0.7em;}
+      .delete:hover{color:red;}
       #editjson{width:100%;height:400px;}
       #editform{clear:both;}
       #editform input{width:100%;}
+      .phoneid{margin:0px;}
+      .uuid{color:#ccc;height:2.5em;overflow:hidden;}
     </style>
   </head>
   <body>
