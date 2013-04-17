@@ -1,7 +1,9 @@
 <?php  
 
 // Which IP addresses have permission to delete tracks?
-$IParray = array("217.44.120.135");
+$IParray = array(
+"217.44.120.135", "81.2.68.178"
+);
 
 // Now lets sort permissions
 $IP = $_SERVER['REMOTE_ADDR'];
