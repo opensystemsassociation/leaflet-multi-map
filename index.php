@@ -120,7 +120,7 @@ function lmm_saveposteddata(){
 
         // Create a track directory if it doesn't exist
         if(!is_dir($trackdir)){
-            mkdir($trackdir, 0777, true); // Recursive.
+            mkdir($trackdir, 0775, true); // Recursive.
             $status .= " ctd"; // Directory created.
         }
 
@@ -162,13 +162,13 @@ function lmm_saveposteddatastring(){
     $path = "$trackdir/data.json";
     // Create a root directory if it doesn't exist
     if(!is_dir($root)){
-      mkdir($root);
+      mkdir($root, 0775, true);
       //chmod($root, 0755);
       $status .= " crd";
     }
     // Create a track directory if it doesn't exist
     if(!is_dir($trackdir)){
-      mkdir($trackdir);
+      mkdir($trackdir, 0775, true);
       //chmod($trackdir, 0755);
       $status .= " ctd";
     }
@@ -239,13 +239,13 @@ function lmm_saveB64imagestr(){
     $path = "$trackdir/".$imgtitle;
     // Create a root directory if it doesn't exist
     if(!is_dir($root)){
-      mkdir($root);
+      mkdir($root, 0775, true);
       //chmod($root, 0755);
       $status .= " crd";
     }
     // Create a track directory if it doesn't exist
     if(!is_dir($trackdir)){
-      mkdir($trackdir);
+      mkdir($trackdir, 0775, true);
       //chmod($trackdir, 0755);
       $status .= " ctd";
     }

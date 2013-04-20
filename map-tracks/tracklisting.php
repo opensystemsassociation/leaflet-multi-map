@@ -4,6 +4,7 @@ include_once "../utils.php";
 // SETUP VARS
 $deleteme = lmm_checkPOSTGETvar("delete", null, "GET");
 $editme = lmm_checkPOSTGETvar("edit", null, "GET");
+$images = lmm_checkPOSTGETvar("images", null, "GET");
 $format = lmm_checkPOSTGETvar("format", "json", "GET");
 $arr = array();
 $arr = readdirectory('tracks', 'data.json', $arr);
@@ -16,7 +17,9 @@ $editoutput = "";
 if(ISADMIN){
   $format = "html";
   $deleteoutput = deletetrackdir($deleteme);
-  $editoutput .= edittrack($editme);
+  $editoutput = edittrack($editme);
+  $imageoutput = renderimages($images);
+  $imagehtml = $imageoutput['msg'].'<hr />'.imagehtml($imageoutput);
 }
 // HTML or json output?
 if( $format == "json" ) {
@@ -24,7 +27,7 @@ if( $format == "json" ) {
   print json_encode($arr['list']);  
 }else{
   $htmllists = nicehtmllist($arr, $humanuuid, $IParray);
-  printpage($deleteoutput.$editoutput.$htmllists);
+  printpage($deleteoutput.$editoutput.$htmllists.$imagehtml);
 }
 
 // FUNCTIONS
@@ -112,6 +115,86 @@ function readdirectory($path, $searchfor, $arr, $lvl=0){
   return $arr;
 }
 
+// Generate an HTML list of images
+function imagehtml($track){  
+  if(!isset($track['track']->track->points->image)) return "";
+  $thumburl = $track['thumburl'];
+  $output = "";
+  $i = 0;
+  foreach($track['track']->track->points->image as $image){
+    //$output .= "$thumburl/$image";
+    if($image!=0){
+      $output .= "<img src=\"$thumburl/$image\" id=\"i$i\" />";
+    }
+    $i++;
+  }
+  return $output;
+}
+
+// Grab list of images from a directory
+function renderimages($path){  
+  if(is_null($path)) return "";
+  // Prep vars
+  $output = array();
+  $throttle = 10; // make sure we only process 10 images at a time
+  $i = 0;
+  $relativeurl = str_replace('/tracklisting.php','',$_SERVER['SCRIPT_NAME']).'/'.$path;
+  $thumburl = $relativeurl.'/dwebimages/thumbs';
+  $path = realpath($path);
+  $webimagedir = "$path/dwebimages";
+  $webimagedirthumbs = "$path/dwebimages/thumbs";
+  $webimagedirbigger = "$path/dwebimages/bigger";
+  $trackvars = json_decode(file_get_contents("$path/data.json"));
+  $output['track'] = $trackvars;
+  $output['thumburl'] = $thumburl;
+  $imagetotal = 0;
+  $prepedimages = 0;
+  if(isset($trackvars->track->imagerotate)) $rotate = $trackvars->track->imagerotate;
+  else $rotate = 0;
+  // Generate default directories
+  if(!is_dir($webimagedir)) mkdir($webimagedir, 0775, true); // Recursive.
+  if(!is_dir($webimagedirthumbs)) mkdir($webimagedirthumbs, 0775, true); // Recursive.
+  if(!is_dir($webimagedirbigger)) mkdir($webimagedirbigger, 0775, true); // Recursive.
+  // Now loop through the diretory
+  if ($handle = opendir($path)) {
+    while (false !== ($ref = readdir($handle))) {
+      if ($ref != '.' and $ref != '..' and $ref!='data.json' and !is_dir($path.'/'.$ref)) {
+        $imagefilepath = $path.'/'.$ref;
+        $imgthumnailpath = $webimagedirthumbs.'/'.$ref;
+        $arr[] = $imagefilepath;
+        // If the thumbnail doesn't already exist, create it
+        $thumbexists = is_file($imgthumnailpath);
+        if($i<=$throttle && !$thumbexists){
+          resizeimage($imagefilepath, $imgthumnailpath, $rotate, 200, 0); // set width to 200px and leave aspect ratio
+          $i++;
+        }else{
+          $prepedimages ++;
+        }
+        $imagetotal ++;
+        //if($thumbexists) print '<img src="'.$thumburl.'/'.$ref.'" />';
+      }
+    }
+    closedir($handle);
+  }
+  $lefttorender =  $imagetotal-$prepedimages;
+  // Loop through the 
+  $output['imagestorender'] = $imagetotal;
+  $output['msg'] = "<b>Images:</b> $imagetotal (To render:$lefttorender)";
+  return $output; 
+}
+
+// Generate a new image at the specified directory can set just one w/h value & aspect ration is calculated.
+function resizeimage($imagefilepath, $newimagefilepath, $rotate, $width=0, $height=0){  
+  $img = new Imagick($imagefilepath); 
+  $img->setImageResolution(72,72); 
+  $img->resampleImage(72,72,imagick::FILTER_UNDEFINED,1); 
+  $img->scaleImage($width,$height); 
+  if($rotate!=0) $img->rotateImage(new ImagickPixel(), $rotate);
+  //$d = $img->getImageGeometry(); // $d['height']; 
+  $img->writeImage($newimagefilepath); 
+  $img->destroy(); 
+}
+
 // Generate a nice set of html lists
 function nicehtmllist($arr, $humanuuid, $IParray){
   // setup vars
@@ -136,6 +219,7 @@ function nicehtmllist($arr, $humanuuid, $IParray){
       $jsonurl = $rooturl."/map-tracks/tracks/$key/$datafile/data.json";
       $editjsonurl = $_SERVER['SCRIPT_NAME']."?format=html&edit=tracks/$key/$datafile/data.json";
       $deleteurl = "tracks/$key/$datafile";
+      $imagesurl = $_SERVER['SCRIPT_NAME']."?format=html&images=tracks/$key/$datafile";
 
       // Are any of these being deleted?
       $deleteclass = "";
@@ -170,18 +254,20 @@ function nicehtmllist($arr, $humanuuid, $IParray){
         }
       }
 
-
       // Now prep the links
       $output .=  "<li class=\"$deleteclass\">";
       $output .=  "<div class=\"title\">";
       if(ISADMIN) $output .= "<a class=\"delete\" href=\"?delete=$deleteurl\">[x]</a>";
       $output .=  " <a href=\"$mapurl\" class=\"description\">$description</a>"; 
       $output .=  "</div>";
-      $output .=  " <a href=\"$mapurl\">";
-      $output .=  "<span class=\"datetime\">$date $time \"$tag\"</span>"; 
-      $output .=  "</a>";
+      $output .=  " <a href=\"$mapurl\"><span class=\"datetime\">$date $time \"$tag\"</span></a>";
+      $output .=  "<div class=\"tracklinks\">";
       $output .=  " <a class=\"jsonlink\" href=\"$jsonurl\">json</a> "; 
-      if(ISADMIN) $output .=  "<a class=\"jsonlink\" href=\"$editjsonurl\">[e]&nbsp;</a>"; 
+      if(ISADMIN){
+        $output .=  "<a class=\"jsonlink\" href=\"$editjsonurl\">[e]&nbsp;</a>"; 
+        $output .=  "<a class=\"jsonlink\" href=\"$imagesurl\">[i]&nbsp;</a>"; 
+      }
+      $output .=  "</div>";
       $output .=  "</li>";
     }
     $output .=  "</ol></div>";    
@@ -203,7 +289,7 @@ function printpage($content){ ?>
       li{list-style:none;border-top:1px solid #ccc;padding-bottom:2px;}
       a{text-decoration:none}
       .tracklists{clear:both;}
-      a.jsonlink{text-decoration:none;color:#ccc;font-size:0.7em;float:right;}
+      a.jsonlink{text-decoration:none;color:#ccc;font-size:0.7em;}
       a.description{font-color:#555;}
       .datetime{font-size:0.8em;color:#333;}
       .box{float:left;width:24%;}
@@ -213,7 +299,7 @@ function printpage($content){ ?>
       #editform{clear:both;}
       #editform input{width:100%;}
       .phoneid{margin:0px;}
-      .uuid{color:#ccc;height:2.5em;}
+      .uuid{color:#ccc;height:2.5em;overflow:hidden;}
       .deletethis{border:3px solid red;}
       .deletebut{padding:5px;margin-bottom:10px;border:3px solid red;display:block;width:50px;float:left;}
       .deletebut:hover{border:3px solid #333;}
@@ -226,4 +312,3 @@ function printpage($content){ ?>
   </html>
 
 <?php } ?>
-

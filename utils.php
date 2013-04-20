@@ -2,7 +2,7 @@
 
 // Which IP addresses have permission to delete tracks?
 $IParray = array(
-"217.44.120.135", "81.2.68.178"
+"217.44.120.135", "81.2.68.178", "217.42.187.243"
 );
 
 // Now lets sort permissions

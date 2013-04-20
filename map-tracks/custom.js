@@ -1,4 +1,5 @@
 (function(){ 
+
     /* SETUP VARIABLES  */  
     var defaults = false;
     if(dlat=='' || dlng=='') {
@@ -69,7 +70,8 @@
      */
     function moveme(){
         $.each(routeLines, function(i, routeLine) {
-	    var latlon = routeLine.getLatLngs(); 
+	        var latlon = routeLine.getLatLngs(); 
+            latlon = gpssmooth();
             var marker = L.animatedMarker(latlon, {
                 icon: dotIcon,
                 autoStart: false,
@@ -144,5 +146,14 @@
     function addline(pointList, style){
         return new L.Polyline(pointList, style).addTo(map);  
     }  
+
+    /* GPS FILTER */
+    function gpssmooth(latlng){
+        return latlng;
+    }
+
+    function karmelfilter(){
+        
+    }
 
 })();
