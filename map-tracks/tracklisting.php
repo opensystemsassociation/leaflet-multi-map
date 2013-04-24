@@ -136,7 +136,7 @@ function renderimages($path){
   if(is_null($path)) return "";
   // Prep vars
   $output = array();
-  $throttle = 10; // make sure we only process 10 images at a time
+  $throttle = 30; // make sure we only process # images at a time
   $i = 0;
   $relativeurl = str_replace('/tracklisting.php','',$_SERVER['SCRIPT_NAME']).'/'.$path;
   $thumburl = $relativeurl.'/dwebimages/thumbs';
@@ -185,6 +185,8 @@ function renderimages($path){
 
 // Generate a new image at the specified directory can set just one w/h value & aspect ration is calculated.
 function resizeimage($imagefilepath, $newimagefilepath, $rotate, $width=0, $height=0){  
+  if(!is_file($imagefilepath)) return;
+  if(!getimagesize($imagefilepath)) return; 
   $img = new Imagick($imagefilepath); 
   $img->setImageResolution(72,72); 
   $img->resampleImage(72,72,imagick::FILTER_UNDEFINED,1); 
@@ -265,8 +267,8 @@ function nicehtmllist($arr, $humanuuid, $IParray){
       $output .=  " <a class=\"jsonlink\" href=\"$jsonurl\">json</a> "; 
       if(ISADMIN){
         $output .=  "<a class=\"jsonlink\" href=\"$editjsonurl\">[e]&nbsp;</a>"; 
-        $output .=  "<a class=\"jsonlink\" href=\"$imagesurl\">[i]&nbsp;</a>"; 
       }
+      $output .=  "<a class=\"jsonlink\" href=\"$imagesurl\">[i]&nbsp;</a>"; 
       $output .=  "</div>";
       $output .=  "</li>";
     }
