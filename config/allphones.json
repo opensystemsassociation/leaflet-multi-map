@@ -1,0 +1,28 @@
+{
+    "whichgps" : "watch",      
+    "tickInterval": 1000,
+    "accelSensitivity": 2.8,
+    "recordInterval" : 5,
+    "geoUpdateInterval" : 500,
+    "distanceThreshold" : 1000,
+    "sendCurrPosInterval" : 10000,
+    "stopAfter" : 7200,
+    "dirformat" : "y-m-d-m-s-ms",
+    "activityTags" : [
+        "Take image every 5 seconds",
+        "Take image on Accellerometer event",
+        "Take image on GSR event",
+        "Take image on Light event"
+    ],
+    "postUrls"    : {
+        "live" : "index.php?q=savelivedevice",
+        "data" : "index.php?q=savedata"
+    },
+    "phonename": {
+        "683c1fef2ba40248": "TK Android",
+        "c3d938c88678179": "Alf",
+        "aaf09baa1477949" : "Grahams Android",
+        "c8f95d649cd7addd" : "GF Android",
+        "287BE0FC-A3BC-4FE1-94C0-5A8FB42167FE" : "Tom's iPhone"
+    }
+}

@@ -1,9 +1,10 @@
 <?php  
 
-// Which IP addresses have permission to delete tracks?
-$IParray = array(
-"217.44.120.135", "81.2.68.178", "217.42.187.243", "158.223.71.200"
-);
+include('config/app.php');
+$jsonfile = realpath(dirname(".")).'/../config/allphones.json';
+$phoneconfig = json_decode(file_get_contents($jsonfile));
+$humanuuid = $phoneconfig->phonename;
+//print_r($humanuuid);
 
 // Now lets sort permissions
 $IP = $_SERVER['REMOTE_ADDR'];
@@ -14,12 +15,14 @@ if(in_array($IP, $IParray)){
 }
 
 // Give human names to the phones
+/*
 $humanuuid = array(
   '287BE0FC-A3BC-4FE1-94C0-5A8FB42167FE' =>"Toms Iphone",
   '683c1fef2ba40248'=>"TK Android",
   'c8f95d649cd7addd'=>"GF Android",
   'aaf09baa1477949'=>"Grahams Android"
 );
+*/
 
 
 /*

@@ -136,7 +136,7 @@ function renderimages($path){
   if(is_null($path)) return "";
   // Prep vars
   $output = array();
-  $throttle = 30; // make sure we only process # images at a time
+  $throttle = 50; // make sure we only process # images at a time
   $i = 0;
   $relativeurl = str_replace('/tracklisting.php','',$_SERVER['SCRIPT_NAME']).'/'.$path;
   $thumburl = $relativeurl.'/dwebimages/thumbs';
@@ -208,7 +208,7 @@ function nicehtmllist($arr, $humanuuid, $IParray){
     sort($arr['orderd'][$key]);
     rsort($arr['orderd'][$key]);
     $uuid = $key;
-    if(isset($humanuuid[$key])) $uuid = $humanuuid[$key];
+    if(isset($humanuuid->$key)) $uuid = $humanuuid->$key;
     $output .= "<div class=\"box\"><h3 class=\"phoneid\">$uuid</h3>";
     $output .= "<div class=\"uuid\">PhoneID: $key</div>";
     $output .=  '<ol>';
