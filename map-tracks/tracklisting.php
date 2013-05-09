@@ -18,9 +18,11 @@ if(ISADMIN){
   $format = "html";
   $deleteoutput = deletetrackdir($deleteme);
   $editoutput = edittrack($editme);
-  $imageoutput = renderimages($images);
-  $imagehtml = $imageoutput['msg'].'<hr />'.imagehtml($imageoutput);
 }
+$imageoutput = renderimages($images);
+$imagehtml = $imageoutput['msg'].'<hr />'.imagehtml($imageoutput);
+
+
 // HTML or json output?
 if( $format == "json" ) {
   // print a json array of all data files
@@ -136,7 +138,7 @@ function renderimages($path){
   if(is_null($path)) return "";
   // Prep vars
   $output = array();
-  $throttle = 50; // make sure we only process # images at a time
+  $throttle = 30; // make sure we only process # images at a time
   $i = 0;
   $relativeurl = str_replace('/tracklisting.php','',$_SERVER['SCRIPT_NAME']).'/'.$path;
   $thumburl = $relativeurl.'/dwebimages/thumbs';
