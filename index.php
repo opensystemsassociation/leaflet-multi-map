@@ -8,34 +8,6 @@
  * ======================
 */
 include_once "utils.php";
-
-// Returns /path/to/maps/index.php
-function lmm_getBase($getdir=false) {
-    // Get executing filename.
-    $break = explode('/', $_SERVER["SCRIPT_NAME"]);
-    $currfile = $break[count($break) - 1]; 
-
-    $url = $_SERVER['REQUEST_URI']; 
-    $parts = explode('/',$url);
-    $dir = "";
-    for ($i = 0; $i < count($parts) - 1; $i++) {
-
-        if( $getdir === false 
-            || ( $getdir === true && $parts[$i] != $currfile ) ){
-                $dir .= $parts[$i] . "/";
-            }
-
-    }
-    return $dir;
-
-}
-
-function lmm_getConfig(){
-    return (object) array(
-        "defaultMap"    => "map-live"
-    );
-}
-
 lmm_init();
 
 
@@ -52,7 +24,7 @@ function lmm_init(){
   $jsvars['dlat'] = lmm_checkPOSTGETvar('dlat', '', 'GET');
   $jsvars['dlng'] = lmm_checkPOSTGETvar('dlng', '', 'GET'); 
 
-  // select output
+  // Select output
   switch($page){
     case "savelivedevice":
       // lmm_savelivedevice(); 
@@ -60,11 +32,14 @@ function lmm_init(){
     case "savedatastring":
         lmm_saveposteddatastring();
     break; 
+    case "saveB64imagestr":
+        lmm_saveB64imagestr(); 
+        break;
     case "savedata":
         lmm_saveposteddata(); 
-    break; 
-      lmm_postform(); 
+    break;  
     case "postform":
+      lmm_postform();
     break;     
     default:  
         $baseUrl = lmm_getBase();
@@ -145,7 +120,7 @@ function lmm_saveposteddata(){
 
         // Create a track directory if it doesn't exist
         if(!is_dir($trackdir)){
-            mkdir($trackdir, 0777, true); // Recursive.
+            mkdir($trackdir, 0775, true); // Recursive.
             $status .= " ctd"; // Directory created.
         }
 
@@ -187,13 +162,13 @@ function lmm_saveposteddatastring(){
     $path = "$trackdir/data.json";
     // Create a root directory if it doesn't exist
     if(!is_dir($root)){
-      mkdir($root);
+      mkdir($root, 0775, true);
       //chmod($root, 0755);
       $status .= " crd";
     }
     // Create a track directory if it doesn't exist
     if(!is_dir($trackdir)){
-      mkdir($trackdir);
+      mkdir($trackdir, 0775, true);
       //chmod($trackdir, 0755);
       $status .= " ctd";
     }
@@ -242,14 +217,86 @@ function lmm_postform(){
  * Save an image uploaded via phonegap   
  * UNTESTED
 */
-function lmm_saveimage(){
-  $postdata = file_get_contents("php://input");
-  $postdata = str_replace('data:image/jpg;base64,', '', $postdata);
-  $imgdata = base64_decode($postdata);
-  file_put_contents(
-        'test/' . $fn,
-        $imgdata
-  );
+function lmm_saveB64imagestr(){
+
+    // Set the variables
+  $status = "";
+  $uuid = lmm_checkPOSTGETvar('uuid', NULL, 'GET');
+  $tracktitle = lmm_checkPOSTGETvar('tracktitle', null, 'POST');
+  $imgtitle = lmm_checkPOSTGETvar('imgtitle', null, 'POST');
+  $imgstr = lmm_checkPOSTGETvar('imgstr', null, 'POST');
+
+  // if ok, then save them
+  if(isset($tracktitle) && isset($imgtitle) && isset($imgstr) && $uuid!=NULL) {
+    // Initialise vars
+    $status .= "gv";       
+    
+    $imgstr = str_replace('data:image/jpeg;base64,', '', $imgstr);
+    $msg = base64_decode($imgstr);
+
+    $root = realpath(dirname(".")) . "/map-tracks/tracks/$uuid/";
+    $trackdir = "$root/$tracktitle";
+    $path = "$trackdir/".$imgtitle;
+    // Create a root directory if it doesn't exist
+    if(!is_dir($root)){
+      mkdir($root, 0775, true);
+      //chmod($root, 0755);
+      $status .= " crd";
+    }
+    // Create a track directory if it doesn't exist
+    if(!is_dir($trackdir)){
+      mkdir($trackdir, 0775, true);
+      //chmod($trackdir, 0755);
+      $status .= " ctd";
+    }
+    // Create/Write to file
+    if(!file_exists($path)){ 
+      $f = fopen($path, "a+");
+      fwrite($f, $msg);
+      fclose($f);
+      //chmod($path, 0755);
+      $status .= " cf";    
+    }else{   
+      $f = fopen($path, 'w') or die("Can't Open File:".$path);
+      fwrite($f, $msg);
+      fclose($f);
+      $status .= " w";  
+    }    
+  }else{
+    $status .= "NoVars";
+  }
+  // print a json response
+  print $status;
+  // Log the current output
+  //lmm_logoutput($status);
 }  
+
+
+// Returns /path/to/maps/index.php
+function lmm_getBase($getdir=false) {
+    // Get executing filename.
+    $break = explode('/', $_SERVER["SCRIPT_NAME"]);
+    $currfile = $break[count($break) - 1]; 
+
+    $url = $_SERVER['REQUEST_URI']; 
+    $parts = explode('/',$url);
+    $dir = "";
+    for ($i = 0; $i < count($parts) - 1; $i++) {
+
+        if( $getdir === false 
+            || ( $getdir === true && $parts[$i] != $currfile ) ){
+                $dir .= $parts[$i] . "/";
+            }
+
+    }
+    return $dir;
+
+}
+
+function lmm_getConfig(){
+    return (object) array(
+        "defaultMap"    => "map-live"
+    );
+}
 
 ?>
