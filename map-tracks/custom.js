@@ -8,8 +8,9 @@
         defaults = true;
     }
 
-    var rootdir = basedir+"map-tracks/";
-    var routeLines;  
+    var rootdir = basedir+"map-tracks/",
+        routeLines,
+        map;
     var config = {
         tileUrl : 'http://{s}.tiles.mapbox.com/v3/openplans.map-g4j0dszr/{z}/{x}/{y}.png',
         tileAttrib : 'Map tiles: OpenStreetMap ',
@@ -37,29 +38,70 @@
         shadowUrl: null
     });
 
-    /* LOAD INITIAL MAP LAYERS */
-    var map = L.map('map', {minZoom: config.minZoom, maxZoom: config.maxZoom});
-    map.addLayer(new L.TileLayer(config.tileUrl, {attribution: config.tileAttrib}));
-    map.setView(config.initLatLng, config.initZoom);
-
-    /* INITIALISE MAP FUNCTONALITY */    
-    map.on('click', onMapClick);   
-
     /* LOAD TRACK FILENAMES VIA AJAX */  
     var jsonpath =  rootdir + "tracks/" + QueryString.uuid + "/" + QueryString.title + "/data.json";
-    console.log(jsonpath);
-    $.getJSON(jsonpath, function(data) {
-        console.log(data);
-        var gps = data.track.points.gps;   
+    $.getJSON(jsonpath, initMap);
+    /* LOAD INITIAL MAP LAYERS */
+    
+    function initMap(data) {
+
+        var gpsStart = data.track.points.gps[0];
+        config.initLatLng = new L.LatLng(gpsStart[0], gpsStart[1]);
+
+        map = L.map('map', {minZoom: config.minZoom, maxZoom: config.maxZoom});
+        map.addLayer(new L.TileLayer(config.tileUrl, {attribution: config.tileAttrib}));
+        map.setView(config.initLatLng, config.initZoom);
+
+        /* INITIALISE MAP FUNCTONALITY */    
+        map.on('click', onMapClick);   
+
+        addData(data);
+
+    };
+
+    function addData(data) {
+
+        var layers = { shake : {} };
+
+        var gps = data.track.points.gps;
         var line = addline(gps, redlinestyle);
         var len = gps.length-1; 
+
+        var layersConfig = [
+            { type : "shakeevent",  displayname : "Shake Events", icon : "" }
+        ];
+
+        var i = layersConfig.length;
+        while( i-- ){
+            var lc = layersConfig[i],
+                lg = new L.layerGroup();
+            for (var i = 0; i < gps.length; i++) {
+                var gpspoint = gps[i],
+                    layerData = data.track.points[lc.type][i];
+                // Create marker and add to layer.
+                if( lc.hasOwnProperty( "icon" ) && lc.icon != "" ) {
+                    lg.addLayer( new L.marker(gpspoint, {icon: new L.icon()}) );
+                } else {
+                    lg.addLayer( new L.CircleMarker(gpspoint, { radius: layerData }) );
+                }
+
+            }
+            // Add layer to map.
+            lg.addTo( map );
+            // Create layer control config...
+            var lcConfig = {};
+            lcConfig[lc.displayname] = lg;
+            // Add controls for layer.
+            L.control.layers(null, lcConfig ).addTo( map );
+        }
+
         map.setView(gps[0], config.initZoom);
         addmarker(gps[0], 10, redlinestyle);   
         addmarker(gps[len], 10, redlinestyle);  
         routeLines = [ L.polyline(gps) ];   
         moveme();  
-    });
 
+    }
 
     /* LOOP AN ANIMATION ALONG SOME POLYLINES 
      *  Example usage:   
