@@ -55,11 +55,11 @@
         /* INITIALISE MAP FUNCTONALITY */    
         map.on('click', onMapClick);   
 
-        addGPS(data);
+        addData(data);
 
     };
 
-    function addGPS(data) {
+    function addData(data) {
 
         var layers = { shake : {} };
 
@@ -67,9 +67,33 @@
         var line = addline(gps, redlinestyle);
         var len = gps.length-1; 
 
-        for (var i = 0; i < gps.length; i++) {
-            gps[i]
-        };
+        var layersConfig = [
+            { type : "shakeevent",  displayname : "Shake Events", icon : "" }
+        ];
+
+        var i = layersConfig.length;
+        while( i-- ){
+            var lc = layersConfig[i],
+                lg = new L.layerGroup();
+            for (var i = 0; i < gps.length; i++) {
+                var gpspoint = gps[i],
+                    layerData = data.track.points[lc.type][i];
+                // Create marker and add to layer.
+                if( lc.hasOwnProperty( "icon" ) && lc.icon != "" ) {
+                    lg.addLayer( new L.marker(gpspoint, {icon: new L.icon()}) );
+                } else {
+                    lg.addLayer( new L.CircleMarker(gpspoint, { radius: layerData }) );
+                }
+
+            }
+            // Add layer to map.
+            lg.addTo( map );
+            // Create layer control config...
+            var lcConfig = {};
+            lcConfig[lc.displayname] = lg;
+            // Add controls for layer.
+            L.control.layers(null, lcConfig ).addTo( map );
+        }
 
         map.setView(gps[0], config.initZoom);
         addmarker(gps[0], 10, redlinestyle);   
