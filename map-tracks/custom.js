@@ -52,7 +52,7 @@
         map.addLayer(new L.TileLayer(config.tileUrl, {attribution: config.tileAttrib}));
         map.setView(config.initLatLng, config.initZoom);
 
-        /* INITIALISE MAP FUNCTONALITY */    
+        /* INITIALISE MAP CLICK FUNCTONALITY */    
         map.on('click', onMapClick);   
 
         addData(data);
@@ -64,28 +64,62 @@
         var layers = { shake : {} };
 
         var gps = data.track.points.gps;
+        var gps_timestamp = data.track.points.gps_timestamp;
+        var dist = data.track.points.dist;
         var line = addline(gps, redlinestyle);
-        var len = gps.length-1; 
-
+        var len = gps.length-1;
+        var pointcounter = {images:0,  messages:0};
+        var strings = {images : "",  messages : ""};
+        var imagelist = [];
         var layersConfig = [
             { type : "shakeevent",  displayname : "Shake Events", icon : "" }
         ];
+        var nn = layersConfig.length;
 
-        var i = layersConfig.length;
-        while( i-- ){
-            var lc = layersConfig[i],
+
+        while( nn-- ){
+            var lc = layersConfig[nn],
                 lg = new L.layerGroup();
-            for (var i = 0; i < gps.length; i++) {
-                var gpspoint = gps[i],
-                    layerData = data.track.points[lc.type][i];
-                // Create marker and add to layer.
-                if( lc.hasOwnProperty( "icon" ) && lc.icon != "" ) {
-                    lg.addLayer( new L.marker(gpspoint, {icon: new L.icon()}) );
-                } else {
-                    lg.addLayer( new L.CircleMarker(gpspoint, { radius: layerData }) );
-                }
 
+            for (var i = 0; i < gps.length; i++) {
+                // DISPLAY BUMP EVENTS
+                
+                if(lc.type==undefined){
+                    $("#info").append(i+":"+lc.type);
+                }
+                   var gpspoint = gps[i],
+                        layerData = data.track.points[lc.type][i];
+                    if( lc.hasOwnProperty( "icon" ) && lc.icon != "" ) {
+                        lg.addLayer( new L.marker(gpspoint, {icon: new L.icon()}) );
+                    } else {
+                        lg.addLayer( new L.CircleMarker(gpspoint, { radius: layerData }) );
+                    }
+                //}
+                
+
+                // LOAD IMAGES
+                if(data.track.points.image[i]!=0){
+                    pointcounter.images++;
+                    var url = jsonpath =  rootdir + "tracks/" + QueryString.uuid + "/" + QueryString.title + "/dwebimages/thumbs/"+data.track.points.image[i];
+                    var mystr = '<img src="'+url+'" />';
+                    strings.images += mystr;
+                    imagelist.push(mystr);
+                }
+                /* LOAD MESSAGES
+                if(data.track.points.messages!=undefined || data.track.points.messages!=NaN){
+                    if(data.track.points.messages[i]!=0){
+                        pointcounter.messages++;
+                        strings.messages += data.track.points.messages[i];
+                    }
+                }*/
             }
+            // Write the images
+            $("#allimages").html("<strong>"+pointcounter.images+" images</strong><br />"+strings.images);
+            // Create an image animation
+            animateimages(imagelist);
+            // Write the messages
+            $("#messages").html("<strong>"+pointcounter.messages+" messages</strong><br />"+strings.messages);
+
             // Add layer to map.
             lg.addTo( map );
             // Create layer control config...
@@ -99,8 +133,23 @@
         addmarker(gps[0], 10, redlinestyle);   
         addmarker(gps[len], 10, redlinestyle);  
         routeLines = [ L.polyline(gps) ];   
-        moveme();  
+        //moveme();  
 
+    }
+
+    /* CREATE ANIMATION FROM A DIV FULL OF IMAG
+     */
+    function animateimages(imagelist){
+        // Create a new div to animate in
+        var imgcount = 0;
+        setInterval(function(){
+            imgcount++;
+            if(imgcount < imagelist.length){
+                $("#imageanimation").html(imagelist[imgcount]);
+            }else{
+                imgcount=0;
+            }
+        }, 125);
     }
 
     /* LOOP AN ANIMATION ALONG SOME POLYLINES 

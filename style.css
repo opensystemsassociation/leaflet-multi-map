@@ -1,12 +1,41 @@
 #map {
-  position:absolute;
+  position:fixed;
   top:0;
   bottom:0;
   right:0;
-  left:0;
+  left:50%;
 }
-
-body { margin: 0; }
+#imageanimation{
+  width:50%;
+}
+#imageanimation img{
+  width:100%;
+}
+.datawidth{
+  width: 50%;
+  overflow:hidden;
+  word-wrap: break-word;
+}
+.container{
+  margin:0px;
+}
+#allimages img{
+  width:25%;
+}
+#json{
+  font-family:monospace;
+}
+#json h2 a{
+  font-size:0.5em;
+  text-decoration:none;
+}
+body { 
+  margin: 0; 
+  font-family: verdana, arial, sans-serif;
+  font-weight:normal;   
+  font-size:13px;
+}
+h2{font-family:'Raleway';}
 
 /* All of this is from cibi.me */
 

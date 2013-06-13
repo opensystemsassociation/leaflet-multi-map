@@ -47,11 +47,26 @@
 
     <?php endif; ?>
 
+  <!--embed the list of images -->
+<div class="container">
+  <div id="info" class="datawidth">Info</div>
+  <div id="imageanimation">image animation</div>
+  <div id="graph" class="datawidth">Graph</div>
+  <div id="messages"  class="datawidth">Messages</div>
+  <div id="allimages"  class="datawidth">Loading</div>
+  <div id="json"  class="datawidth"><h2>Json Data <a href="https://github.com/opensystemsassociation/southendtransportresearch/blob/master/README.md">Read about on github...</a></h2><?php 
+  $path =  realpath(dirname("."))."/map-tracks/tracks/".$_GET[uuid].'/'.$_GET['title'].'/'.'data.json';
+  echo file_get_contents($path); 
+
+  ?></div>
+</div>
+  <!--embed the map -->
   <div id="map"></div>
   <script type="text/javascript" src="<?php echo $baseDir ?>libs-js-css/jquery.min.js"></script>
   <script type="text/javascript" src="<?php echo $baseDir ?>libs-js-css/leaflet.js"></script>
   <script type="text/javascript" src="<?php echo $baseDir ?>libs-js-css/AnimatedMarker.js"></script>
   <script type="text/javascript" src="<?php echo $baseDir ?>libs-js-css/utils.js"></script>
   <script src="<?php print $baseDir.$js; ?>"></script>
+
 </body>
 </html>
