@@ -1,7 +1,8 @@
 <?php  
 
 include('config/app.php');
-$jsonfile = realpath(dirname(".")).'/../config/allphones.json';
+//$jsonfile = realpath(dirname(".")).'/../config/allphones.json';
+$jsonfile = '/home/data/localhost/htdocs/drupal7/sites/transport.yoha.co.uk/leaflet-multi-map/config/allphones.json'; 
 $phoneconfig = json_decode(file_get_contents($jsonfile));
 $humanuuid = $phoneconfig->phonename;
 //print_r($humanuuid);

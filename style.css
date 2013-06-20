@@ -1,29 +1,72 @@
 #map {
   position:fixed;
-  top:0;
-  bottom:0;
+  top:180px;
+  bottom:0%;
   right:0;
   left:50%;
 }
 #imageanimation{
-  width:50%;
+  position:fixed;
+  top:0;
+  right:0;
+  left:25%;
+  height:180px
+;
+  width:25%;
 }
-#imageanimation img{
+#info{
+  position:fixed;
+  top:0;
+  bottom:0%;
+  right:75%;
+  left:0;
+  height:180px;
+  overflow:hidden;
+  background:#fff;
+  overflow:auto;
+}
+#imageanimation .animation img{
   width:100%;
+  background-size:100% 100%;
+}
+#graph{
+  position:fixed;
+  top:0;
+  right:0;
+  left:50%;
+  height:180px
+;
 }
 .datawidth{
-  width: 50%;
+ 
   overflow:hidden;
   word-wrap: break-word;
 }
-.container{
+#container{
   margin:0px;
 }
+#allimages{
+  width:50%;
+  position:fixed;
+  top:180px
+;
+  bottom:130px;
+  right:0;
+  left:0;
+  overflow:auto;
+}
 #allimages img{
-  width:25%;
+  width:10%;
 }
 #json{
+  width:50%;
   font-family:monospace;
+  position:fixed;
+  height:130px;
+  bottom:0px;
+  right:0;
+  left:0;
+  overflow:auto;
 }
 #json h2 a{
   font-size:0.5em;
@@ -35,8 +78,12 @@ body {
   font-weight:normal;   
   font-size:13px;
 }
-h2{font-family:'Raleway';}
-
+h2{font-family:'Raleway';margin-top:0px;}
+ul.infobox, ul.infobox li{
+  padding:0px;
+  margin:0px;
+  list-style: 0px;
+}
 /* All of this is from cibi.me */
 
 #branding {

@@ -135,7 +135,12 @@ function imagehtml($track){
 
 // Grab list of images from a directory
 function renderimages($path){  
-  if(is_null($path)) return "";
+  if(is_null($path)){
+    $output = array();
+    $output['imagestorender'] = 0;
+    $output['msg'] = "";
+    return $output;
+  }
   // Prep vars
   $output = array();
   $throttle = 30; // make sure we only process # images at a time

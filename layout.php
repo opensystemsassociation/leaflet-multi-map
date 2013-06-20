@@ -1,3 +1,21 @@
+<?php
+$path =  realpath(dirname("."))."/map-tracks/tracks/".$_GET['uuid'].'/'.$_GET['title'].'/'.'data.json';
+$rawjson = file_get_contents($path);
+$json = json_decode($rawjson);
+if($json===null){
+  $info = "<br /><strong>Error:<br /></strong>Can't load data due to invalid json file.";
+}else{
+  foreach($json->track->points as $var => $value){
+    $pointnames .= $var.': '.count($value).'<br />';
+  }
+  $info = "<ul class=\"infobox\">";
+  $info .= "<li><h2>".$json->track->description."</h2></li>";
+  $info .= "<li>".$json->track->title."</li>";
+  $info .= "<li>".$json->track->starttime."</li>";
+  $info .= "<li><strong># Data Points</strong><br />".$pointnames ."</li>";
+  $info .= "</ul>";
+}
+?>
 <!DOCTYPE html>
 <!--[if lt IE 7 ]> <html dir="ltr" lang="en-US" class="ie6"> <![endif]-->
 <!--[if IE 7 ]>    <html dir="ltr" lang="en-US" class="ie7"> <![endif]-->
@@ -48,21 +66,20 @@
     <?php endif; ?>
 
   <!--embed the list of images -->
-<div class="container">
-  <div id="info" class="datawidth">Info</div>
-  <div id="imageanimation">image animation</div>
+<div id="container">
+  <div id="info" class="datawidth"><?php print $info; ?></div>
+  <div id="imageanimation"  class="datawidth">image animation</div>
   <div id="graph" class="datawidth">Graph</div>
-  <div id="messages"  class="datawidth">Messages</div>
   <div id="allimages"  class="datawidth">Loading</div>
-  <div id="json"  class="datawidth"><h2>Json Data <a href="https://github.com/opensystemsassociation/southendtransportresearch/blob/master/README.md">Read about on github...</a></h2><?php 
-  $path =  realpath(dirname("."))."/map-tracks/tracks/".$_GET[uuid].'/'.$_GET['title'].'/'.'data.json';
-  echo file_get_contents($path); 
-
-  ?></div>
+  <div id="json"  class="datawidth">
+    <?php print $rawjson; ?>
+    <h2><a href="https://github.com/opensystemsassociation/southendtransportresearch/blob/master/README.md">Read about data structure on github...</a></h2>
+  </div>
 </div>
   <!--embed the map -->
   <div id="map"></div>
   <script type="text/javascript" src="<?php echo $baseDir ?>libs-js-css/jquery.min.js"></script>
+  <script type="text/javascript" src="<?php echo $baseDir ?>libs-js-css/paper-min.js"></script>
   <script type="text/javascript" src="<?php echo $baseDir ?>libs-js-css/leaflet.js"></script>
   <script type="text/javascript" src="<?php echo $baseDir ?>libs-js-css/AnimatedMarker.js"></script>
   <script type="text/javascript" src="<?php echo $baseDir ?>libs-js-css/utils.js"></script>
