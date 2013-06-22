@@ -107,7 +107,8 @@
                 if(i>0){
                     var dist = distance(gps[i][0], gps[i][1], gps[i-1][0], gps[i-1][1]);
                     var avdist = smoothObj.calc(dist);
-                    //console.log(dist+" lat1:"+gps[i]+" lng1:"+gps[i].lng+" lat2:"+gps[i-1].lat+" lng2:" +gps[i-1].lng);
+                    // Testing weird GPS exceptions 
+                    /*console.log(dist+" lat1:"+gps[i]+" lng1:"+gps[i].lng+" lat2:"+gps[i-1].lat+" lng2:" +gps[i-1].lng);
                     if(avdist>=1.0 || avdist<-1.0 || avdist==0.0000){
                         weirdpoints.push(i); 
                     }else{
@@ -115,7 +116,8 @@
                             cleangps.push(gpspoint); 
                             console.log("Pos:"+i+" Ave dist: "+avdist+" lat:"+gps[i][0]);
                         }
-                    }
+                    } */
+                    cleangps.push(gpspoint); 
                     
                     //}
                 }else{
