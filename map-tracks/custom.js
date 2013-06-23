@@ -2,6 +2,7 @@
     /* SETUP paper.js canvas */
     $("#graph").html('<canvas id="myCanvas" style="border 1px solid #ccc" resize> </canvas>');
     var canvas = document.getElementById('myCanvas');
+    var currentpos = null;
     paper.setup(canvas);
 
     /* SETUP VARIABLES  */  
@@ -98,6 +99,7 @@
             var distThreshold = 1.0;
             var weirdpoints = [];
             var cleangps = [];
+            var imgClass = "";
             console.log("Pos:402 "+gps[402]+" Pos:409 "+gps[409]);
             // LOOP THROUGH ALL THE DATA POINTS
             for (var i = 0; i < gps.length; i++) {
@@ -133,12 +135,14 @@
                     }     
                 }           
                 // GENERATE IMAGE HTML
+                imgClass = imgClass+"c"+i+" "; 
                 if(data.track.points.image[i]!=0){
                     var url = rootdir + "tracks/" + QueryString.uuid + "/" + QueryString.title + "/dwebimages/thumbs/"+data.track.points.image[i];
-                    var mystr = '<img id="i'+pointcounter.images+'" src="'+url+'" ref="'+data.track.points.image[i]+'" />';
+                    var mystr = '<img id="i'+pointcounter.images+'" class=\"'+imgClass+'\" src="'+url+'" ref="'+data.track.points.image[i]+'" />';
                     strings.images += mystr;
                     imagelist.urls.push(url);
                     pointcounter.images++;
+                    imgClass = "";
                 }
                 // LOAD MESSAGES
                 //if(data.track.points.messages!=undefined || data.track.points.messages!=NaN){
@@ -164,6 +168,11 @@
         // LETS BUILD THE PAGE
         // Create an image animation
         $("#allimages").html( strings.images );   
+        $("#allimages img").click(function() { 
+            var cord = $(this).attr('id').substring(1);
+            maptomarkerposition(gps[cord], cord);
+        });
+        $("#allimages img").css({'border-bottom':'5px solid #FFF'});
         animateimages("run", imagelist);
 
         // Draw the graph
@@ -179,6 +188,16 @@
         addmarker(gps[len], 10, redlinestyle);  
         routeLines = [ L.polyline(gps) ];   
         //moveme();  
+    }
+
+    // Set map to a position with a marker
+    function maptomarkerposition(coords, arrpos){
+        if(currentpos!=null) map.removeLayer(currentpos);
+        currentpos = addmarker(coords, 15, redlinestyle);  
+        map.setView(coords, config.initZoom);
+        $("#allimages img").css({'border-bottom':'5px solid #FFF'});
+        $("#allimages .c"+arrpos).css({'border-bottom':'5px solid #FF0000'});
+        $("#allimages").scrollTop( $("#allimages").scrollTop()+ $("#allimages .c"+arrpos).position().top );
     }
 
     // Draw a pure html graph
@@ -206,6 +225,14 @@
         var xInc = cw/points.IOIOlight.length;
         var ch = $("#graph").height()-20;
         var scale = 1;
+
+        // Activate mouse event
+        hitTool = new paper.Tool();
+        hitTool.activate();
+        hitTool.onMouseDown = function (event) {
+            var pos = Math.round(event.point.x/xInc)-(borderleft/2);
+            maptomarkerposition(points.gps[pos], pos);
+        }
 
         // Prep GSR graph variables
         var colGsr = 'green';
@@ -301,6 +328,8 @@
         // Draw the path
         //path.fullySelected = false;
         //pathGSR.smooth();
+
+        // Draw the graph
         paper.view.draw();
         return paper;
     }
