@@ -137,7 +137,9 @@
                 // GENERATE IMAGE HTML
                 imgClass = imgClass+"c"+i+" "; 
                 if(data.track.points.image[i]!=0){
-                    var url = rootdir + "tracks/" + QueryString.uuid + "/" + QueryString.title + "/dwebimages/thumbs/"+data.track.points.image[i];
+                    //var url = rootdir + "tracks/" + QueryString.uuid + "/" + QueryString.title + "/dwebimages/thumbs/"+data.track.points.image[i];
+                    var url = baseimagedir+data.track.points.image[i];
+                    console.log(url);
                     var mystr = '<img id="i'+pointcounter.images+'" class=\"'+imgClass+'\" src="'+url+'" ref="'+data.track.points.image[i]+'" />';
                     strings.images += mystr;
                     imagelist.urls.push(url);

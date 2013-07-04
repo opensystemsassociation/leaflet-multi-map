@@ -15,6 +15,13 @@ if($json===null){
   $info .= "<li><strong># Data Points</strong><br />".$pointnames ."</li>";
   $info .= "</ul>";
 }
+// Check if we have thumbnails in the old or new location
+if(is_dir( realpath(dirname("."))."/map-tracks/tracks/".$_GET['uuid'].'/'.$_GET['title'].'/dwebimages/thumbs/') ){
+  $baseimagedir = $baseDir."/map-tracks/tracks/".$_GET['uuid'].'/'.$_GET['title'].'/dwebimages/thumbs/';
+}else{
+  $baseimagedir = $baseDir."/map-tracks/tracks/".$_GET['uuid'].'/'.$_GET['title'];
+}
+
 ?>
 <!DOCTYPE html>
 <!--[if lt IE 7 ]> <html dir="ltr" lang="en-US" class="ie6"> <![endif]-->
@@ -22,7 +29,6 @@ if($json===null){
 <!--[if IE 8 ]>    <html dir="ltr" lang="en-US" class="ie8"> <![endif]-->
 <!--[if IE 9 ]>    <html dir="ltr" lang="en-US" class="ie9"> <![endif]-->
 <!--[if (gt IE 9)|!(IE)]><!--> <html dir="ltr" lang="en-US"> <!--<![endif]-->    
-<!-- <?php echo $baseDir; ?> -->
 <head>
 <title>Tests with Leaflet</title>
 <!--  Mobile Viewport Fix -->
@@ -45,7 +51,8 @@ if($json===null){
 			print "var $key='$value';\n";
 		}
 	?>
-    var basedir = "<?php echo $baseDir; ?>";
+    var basedir = "<?php echo $basebaseDirDir; ?>";
+    var baseimagedir = "<?php echo $baseimagedir; ?>/";
 </script>
 </head>
 <body>

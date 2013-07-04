@@ -92,7 +92,7 @@ function edittrack($editme){
   return $output;
 }
   
-// Recursivly search a directory structure for files named 'data.txt'
+// Recursivly search a directory structure for files named ####
 function readdirectory($path, $searchfor, $arr, $lvl=0){  
   $path = realpath($path);
   $oldpath = $path;
@@ -100,7 +100,7 @@ function readdirectory($path, $searchfor, $arr, $lvl=0){
     while (false !== ($ref = readdir($handle))) {
       if ($ref != '.' and $ref != '..') {
         $newpath = $path.'/'.$ref;
-        if(is_dir($newpath)){
+        if(is_dir($newpath) && $ref!="DELETE"){
           $arr = readdirectory($newpath, $searchfor, $arr);
         }else{
           $savename = explode('/',$newpath);
@@ -275,7 +275,7 @@ function nicehtmllist($arr, $humanuuid, $IParray){
       if(ISADMIN){
         $output .=  "<a class=\"jsonlink\" href=\"$editjsonurl\">[e]&nbsp;</a>"; 
       }
-      $output .=  "<a class=\"jsonlink\" href=\"$imagesurl\">[i]&nbsp;</a>"; 
+      //$output .=  "<a class=\"jsonlink\" href=\"$imagesurl\">[i]&nbsp;</a>"; 
       $output .=  "</div>";
       $output .=  "</li>";
     }
