@@ -1,6 +1,9 @@
 <?php  
 
-include('config/app.php');
+$IParray = array(
+"127.0.0.1", "217.44.122.166","218.44.122.166","86.153.161.219", "217.44.120.135", "81.2.68.178", "217.42.187.243", "158.223.71.200", "86.153.148.146", "94.170.105.61", "46.65.216.68", "213.104.159.16"
+);
+
 //$jsonfile = realpath(dirname(".")).'/../config/allphones.json';
 $jsonfile = '/home/data/localhost/htdocs/drupal7/sites/transport.yoha.co.uk/leaflet-multi-map/config/allphones.json'; 
 $phoneconfig = json_decode(file_get_contents($jsonfile));
