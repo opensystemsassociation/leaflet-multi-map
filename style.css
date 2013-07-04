@@ -25,6 +25,12 @@
   background:#fff;
   overflow:auto;
 }
+#info div{
+  margin:5px;
+}
+.datappoints{
+  margin-top:1em;
+}
 #imageanimation .animation img{
   width:100%;
   background-size:100% 100%;
