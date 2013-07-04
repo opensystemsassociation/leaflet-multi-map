@@ -9,10 +9,12 @@ if($json===null){
     $pointnames .= $var.': '.count($value).'<br />';
   }
   $info = "<ul class=\"infobox\">";
-  $info .= "<li><h2>".$json->track->description."</h2></li>";
-  $info .= "<li>".$json->track->title."</li>";
-  $info .= "<li>".$json->track->starttime."</li>";
-  $info .= "<li><strong># Data Points</strong><br />".$pointnames ."</li>";
+  if(!isset($_GET['embed'])) $info .= "<li><h2>".$json->track->description."</h2></li>";
+  //$info .= "<li>".$json->track->title."</li>";
+  $timearr = explode(' ', $json->track->starttime);
+  $time = $timearr[0].' '.$timearr[1].' '.$timearr[2].' '.$timearr[3].' <br />'.$timearr[4];
+  $info .= "<li><strong>".$time."</strong></li>";
+  $info .= "<li><div class=\"datappoints\"><strong># Data</strong><br />".$pointnames ."</div></li>";
   $info .= "</ul>";
 }
 ?>
@@ -67,7 +69,7 @@ if($json===null){
 
   <!--embed the list of images -->
 <div id="container">
-  <div id="info" class="datawidth"><?php print $info; ?></div>
+  <div id="info" class="datawidth"><div><?php print $info; ?></div></div>
   <div id="imageanimation"  class="datawidth">image animation</div>
   <div id="graph" class="datawidth">Graph</div>
   <div id="allimages"  class="datawidth">Loading</div>
