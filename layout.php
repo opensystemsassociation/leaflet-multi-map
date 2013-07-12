@@ -14,7 +14,16 @@ if($json===null){
   $timearr = explode(' ', $json->track->starttime);
   $time = $timearr[0].' '.$timearr[1].' '.$timearr[2].' '.$timearr[3].' <br />'.$timearr[4];
   $info .= "<li><strong>".$time."</strong></li>";
-  $info .= "<li><div class=\"datappoints\"><strong># Data</strong><br />".$pointnames ."</div></li>";
+  $info .= "<li>
+            <div class=\"datappoints\">
+            <strong>#Device</strong><br />".
+          "PID: ".$json->track->device->uuid.'<br />'.
+          "ID: ".$json->track->title.'<br />'.
+          "Name: ".$json->track->device->name.'<br />'.
+          "Platform: ".$json->track->device->platform.' '.$json->track->device->version.'<br />'.
+          "<strong>#Recorded</strong><br />".
+          $pointnames ."</div>
+          </li>";
   $info .= "</ul>";
 }
 // Check if we have thumbnails in the old or new location

@@ -281,7 +281,8 @@ function nicehtmllist($arr, $humanuuid, $IParray){
     }
     $output .=  "</ol></div>";    
   }
-  $output .=  '<div class="footer">IP: '.$_SERVER['REMOTE_ADDR'].'</div>';
+  $mog .= 'mkdir original; cp *.jpg original;mogrify -resize 200x150 *.jpg';
+  $output .=  '<div class="footer">Resize images saving originals: '.$mog.'<br />IP: '.$_SERVER['REMOTE_ADDR'].'</div>';
   $output .= '</div>';
   return $output;
 }
