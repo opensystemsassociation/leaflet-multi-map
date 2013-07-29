@@ -29,7 +29,10 @@
   margin:5px;
 }
 .datappoints{
-  margin-top:1em;
+  margin-top:-1em;
+}
+.indent{
+  margin-left:10px;
 }
 #imageanimation .animation img{
   width:100%;
@@ -40,8 +43,10 @@
   top:0;
   right:0;
   left:50%;
-  height:180px
-;
+  height:180px;
+}
+#graph:hover{
+  cursor: pointer;
 }
 .datawidth{
  
@@ -58,7 +63,11 @@
   bottom:130px;
   right:0;
   left:0;
+}
+#imagelist{
   overflow:auto;
+  width:100%;
+  height:100%;
 }
 #allimages img{
   width:20%;

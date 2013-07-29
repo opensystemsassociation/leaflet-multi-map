@@ -4,6 +4,11 @@
     var canvas = document.getElementById('myCanvas');
     var currentpos = null;
     paper.setup(canvas);
+    var pathTimeline = new paper.Path();
+    var cw = 0;
+    var xInc = 0;
+    var gborderleft;
+    var currentpoint = 0;
 
     /* SETUP VARIABLES  */  
     var defaults = false;
@@ -169,7 +174,7 @@
 
         // LETS BUILD THE PAGE
         // Create an image animation
-        $("#allimages").html( strings.images );   
+        $("#allimages").html( '<div class="indent"><strong>#Images taken every 5 secs</strong></div><div id="imagelist">'+strings.images+'</div>' );   
         $("#allimages img").click(function() { 
             var cord = $(this).attr('id').substring(1);
             maptomarkerposition(gps[cord], cord);
@@ -179,6 +184,7 @@
 
         // Draw the graph
         drawcanvasgraphs(data.track.points);
+
         //htmlgraph(data.track.points.IOIOlight);
 
         // Write the messages
@@ -197,9 +203,15 @@
         if(currentpos!=null) map.removeLayer(currentpos);
         currentpos = addmarker(coords, 15, redlinestyle);  
         map.setView(coords, config.initZoom);
+        currentpoint = arrpos;
         $("#allimages img").css({'border-bottom':'5px solid #FFF'});
         $("#allimages .c"+arrpos).css({'border-bottom':'5px solid #FF0000'});
-        $("#allimages").scrollTop( $("#allimages").scrollTop()+ $("#allimages .c"+arrpos).position().top );
+        $("#imagelist").scrollTop( $("#imagelist").scrollTop()+ $("#allimages .c"+arrpos).position().top-($("#imagelist").height()/3) );
+    }
+
+    function settimeline(pos){
+        pathTimeline.position.x = xInc*pos+gborderleft;
+        paper.view.draw();
     }
 
     // Draw a pure html graph
@@ -221,10 +233,12 @@
     function drawcanvasgraphs(points){
         // Dont draw the graph if there isn't any
         if(points.IOIOlight===undefined) return;
+
         // Initial vars
-        var borderleft = 30;
-        var cw = $("#myCanvas").width()-(borderleft+10);
-        var xInc = cw/points.IOIOlight.length;
+        var borderleft = 40;
+        gborderleft = borderleft;
+        cw = $("#myCanvas").width()-(borderleft+10);
+        xInc = cw/points.IOIOlight.length;
         var ch = $("#graph").height()-20;
         var scale = 1;
 
@@ -235,6 +249,12 @@
             var pos = Math.round(event.point.x/xInc)-(borderleft/2);
             maptomarkerposition(points.gps[pos], pos);
         }
+
+        // Timeline
+        pathTimeline.style = { strokeColor:'grey',strokeWidth: 1 };
+        pathTimeline.dashArray = [2, 1];
+        pathTimeline.add(new paper.Point(0, 0));
+        pathTimeline.add(new paper.Point(0, ch));
 
         // Prep GSR graph variables
         var colGsr = 'green';
@@ -279,7 +299,7 @@
             if(y>maxYgsr || i==0) maxYgsr = y;
             if(y<minYgsr || i==0) minYgsr = y;
             pathGSR.add(new paper.Point(x, y));
-            // LIGHT;
+            // LIGHT
             var y = ch-(ch*points.IOIOlight[i])*scale;
             if(y>maxYlight || i==0) maxYlight = y;
             if(y<minYlight || i==0) minYlight = y;
@@ -301,15 +321,19 @@
 
         // SHIFT POSITIONS TO ALLOW FOR LABELING
         var labelx = 6;
+
         // Now postion GSR
         pathGSR.position.x += borderleft;
         var tpos = pathGSR._segments[0]._point._y+6; 
-        var textGsr = new paper.PointText({point: [labelx, tpos], content: 'gsr',fillColor:colGsr,fontSize: 12});
+        var textGsr = new paper.PointText({point: [labelx, tpos], content: 'sweat',fillColor:colGsr,fontSize: 12});
 
         // Now postion LIGHT
         pathLight.position.x += borderleft;
         var tpos = pathLight._segments[0]._point._y+6; 
-        var textLight = new paper.PointText({point: [labelx, tpos], content: 'ldr',fillColor:colLight,fontSize: 12});
+        var textLight = new paper.PointText({point: [labelx, tpos], content: 'light',fillColor:colLight,fontSize: 12});
+
+        // And the timeline
+        pathTimeline.position.x += borderleft;
 
         // ACCELEROMETER;
         pathAccelx.position.y = 40;
@@ -322,7 +346,8 @@
         pathAccelz.position.x += borderleft;
         pathAccelz.scale(1,0.03);
         var tpos = pathAccelx._segments[0]._point._y+6; 
-        var textAccel = new paper.PointText({point: [labelx, tpos], content: 'xyz',fillColor:colAcellx,fontSize: 12});
+        var textAccel = new paper.PointText({point: [labelx, tpos], content: 'bump',fillColor:colAcellx,fontSize: 12});
+        var textXYZ = new paper.PointText({point: [labelx, tpos+10], content: '(xyz)',fillColor:colAcellx,fontSize: 12});
 
         //console.log('maxYaccel:'+maxYaccel+' minYaccel:'+minYaccel);
         //console.log('rangedminY:'+range(maxYaccel, minYaccel, ch, 0, minYaccel) );
@@ -332,11 +357,7 @@
         //pathGSR.smooth();
 
         // Draw the graph
-        paper.view.draw();
-        return paper;
-    }
-    function drawcanvastimeline(index){
-
+        paper.view.draw();;
     }
 
     // Convert a varable from one range to another 
@@ -351,13 +372,13 @@
     /* CREATE ANIMATION FROM DIV FULL OF IMAGES
      */
     function animateimages(func, imagelist){
+        currentpoint = 0;
         if(func=="load"){
             // Create a new div to animate in
             var transurl = basedir+'trans.png';
             $("#imageanimation").html('<div class="animation"><img src="'+transurl+'" /><div class="info"></div><div class="msg"></div></div>');
             $("#imageanimation .animation").css({'background-repeat': 'no-repeat', 'background-image':'#ccc'});
         }else{
-            var i = 0;
             var looped = 0;
             var paused = 0;
             // Set markers so we know if an image has loaded or not
@@ -374,21 +395,22 @@
             });
             // Now loop through display of images
             setInterval(function(){
-                if(i < imagelist.urls.length){
-                    var iid = "#i"+i;
+                if(currentpoint < imagelist.urls.length){
+                    var iid = "#i"+currentpoint;
                     var url = $(iid).attr('src');
                     var fn = url.split("/");
                     var fnn = fn[fn.length-1];
                     // Only show if an image has loaded
                     if($(iid).data("status")==2){
                         $("#imageanimation .animation img").css({'background-image': 'url("'+url+'")'});
-                        $("#imageanimation .animation .info").html($(iid).ref+" "+fnn);
+                        //$("#imageanimation .animation .info").html($(iid).ref+" "+fnn);
+                        settimeline(currentpoint);
                     }
                 }else{
-                    i=0;
+                    currentpoint=0;
                     looped=1;
                 }
-                i++;
+                currentpoint++;
             }, 240);
         }
     }
@@ -427,7 +449,7 @@
      *     map.on('click', onMapClick);   
      */   
     function onMapClick(e) {  
-        return addpopup(e.latlng, "You clicked the map at " + e.latlng.toString())     
+        //return addpopup(e.latlng, "You clicked the map at " + e.latlng.toString())     
     }
 
     /* ADD A POPUP 

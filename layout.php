@@ -9,19 +9,25 @@ if($json===null){
     $pointnames .= $var.': '.count($value).'<br />';
   }
   $info = "<ul class=\"infobox\">";
-  if(!isset($_GET['embed'])) $info .= "<li><h2>".$json->track->description."</h2></li>";
-  //$info .= "<li>".$json->track->title."</li>";
   $timearr = explode(' ', $json->track->starttime);
-  $time = $timearr[0].' '.$timearr[1].' '.$timearr[2].' '.$timearr[3].' <br />'.$timearr[4];
-  $info .= "<li><strong>".$time."</strong></li>";
+  if(!isset($_GET['embed'])){
+    $info .= "<li><h2>".$json->track->description."</h2></li>";
+    $time = '<strong>'.$timearr[0].' '.$timearr[1].' '.$timearr[2].' '.$timearr[3].' <br />'.$timearr[4].'</strong>';
+  }else{
+    $time = "";
+  }
+  //$info .= "<li>".$json->track->title."</li>";
+  
+  
   $info .= "<li>
-            <div class=\"datappoints\">
-            <strong>#Device</strong><br />".
+            <div class=\"datappoints\">".
+            $time.
+            "<strong>#Device Info</strong><br />".
           "PID: ".$json->track->device->uuid.'<br />'.
           "ID: ".$json->track->title.'<br />'.
           "Name: ".$json->track->device->name.'<br />'.
           "Platform: ".$json->track->device->platform.' '.$json->track->device->version.'<br />'.
-          "<strong>#Recorded</strong><br />".
+          "<strong>#Data points</strong><br />".
           $pointnames ."</div>
           </li>";
   $info .= "</ul>";
@@ -84,6 +90,9 @@ if(is_dir( realpath(dirname("."))."/map-tracks/tracks/".$_GET['uuid'].'/'.$_GET[
     <?php endif; ?>
 
   <!--embed the list of images -->
+<div id="key">
+  Key
+</div>
 <div id="container">
   <div id="info" class="datawidth"><div><?php print $info; ?></div></div>
   <div id="imageanimation"  class="datawidth">image animation</div>
