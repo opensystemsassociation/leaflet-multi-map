@@ -268,6 +268,7 @@ function nicehtmllist($arr, $humanuuid, $IParray){
       $output .=  "<div class=\"title\">";
       if(ISADMIN) $output .= "<a class=\"delete\" href=\"?delete=$deleteurl\">[x]</a>";
       $output .=  " <a href=\"$mapurl\" class=\"description\">$description</a>"; 
+      $output .= "<div style=\"font-size:70%;font-color:#ccc;\">$datafile</div>";
       $output .=  "</div>";
       $output .=  " <a href=\"$mapurl\"><span class=\"datetime\">$date $time \"$tag\"</span></a>";
       $output .=  "<div class=\"tracklinks\">";
